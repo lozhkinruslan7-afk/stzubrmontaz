@@ -1,0 +1,3069 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ЗубрМонтажСтрой</title>
+
+  <!-- GSAP + ScrollTrigger -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <style>
+    /* ===== БАЗОВЫЕ СБРОСЫ ===== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: 'Segoe UI', 'Roboto', sans-serif;
+      background: #0a0a0a;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* ===== ФОНОВАЯ СЕТКА ===== */
+    .grid-bg {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.03) 1px, transparent 1px);
+      background-size: 60px 60px;
+    }
+
+    /* ===== КОНТЕЙНЕР ===== */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 20px;
+      position: relative;
+      z-index: 1;
+    }
+    section {
+      padding: 80px 0;
+      position: relative;
+    }
+
+    /* ===== ШАПКА ===== */
+    header {
+      position: relative;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 0 24px;
+      border-bottom: 0;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .brand { display:flex; align-items:center; gap:12px; min-width:max-content; }
+    .header-zubr { width:46px; height:44px; flex:0 0 46px; display:block; overflow:visible; pointer-events:none; }
+    .header-zubr .zubr-shadow, .header-zubr .zubr-art { transform:none !important; animation:none !important; }
+    .logo {
+      font-size:28px;
+      font-weight:400;
+      letter-spacing:1.5px;
+      font-family:"Impact","Arial Narrow",Arial,sans-serif;
+      color:#CE1126;
+      -webkit-text-fill-color:#CE1126;
+      text-shadow:none;
+      transition:none;
+    }
+    .logo span { color:#007A33; -webkit-text-fill-color:#007A33; }
+    .brand:hover .logo { color:#CE1126; -webkit-text-fill-color:#CE1126; text-shadow:none; transform:none; }
+    .brand:hover .logo span { color:#007A33; -webkit-text-fill-color:#007A33; }
+
+    /* ===== ГЕРБ ГОРОДА ОСИПОВИЧИ ===== */
+    .city-coat {
+      width:42px;
+      height:50px;
+      object-fit:contain;
+      flex:0 0 42px;
+      display:block;
+      margin-left:2px;
+      filter:drop-shadow(0 5px 12px rgba(0,0,0,.22));
+      transition:none;
+      transform:none;
+      pointer-events:none;
+    }
+
+    .brand:hover .city-coat {
+      transform:none;
+      filter:drop-shadow(0 5px 12px rgba(0,0,0,.22));
+    }
+
+    @media(max-width:600px){
+      .city-coat{
+        width:32px;
+        height:38px;
+        flex-basis:32px;
+      }
+    }
+    nav {
+      display:flex;
+      align-items:center;
+      gap:34px;
+      margin-left:auto;
+    }
+    nav a {
+      position:relative;
+      color:#e8e8e8;
+      text-decoration:none;
+      font-size:16px;
+      font-weight:600;
+      letter-spacing:.1px;
+      padding:8px 0;
+      transition:color .3s ease;
+    }
+    nav a::after {
+      content:"";
+      position:absolute;
+      left:0;
+      right:100%;
+      bottom:0;
+      height:2px;
+      background:#e31e24;
+      transition:right .3s ease;
+    }
+    nav a:hover { color:#fff; }
+    nav a:hover::after { right:0; }
+
+    /* ===== ПЕРЕКЛЮЧАТЕЛЬ ЯЗЫКА ===== */
+    .lang-toggle {
+      display: flex;
+      gap: 8px;
+      background: #222;
+      padding: 4px;
+      border-radius: 6px;
+    }
+    .lang-toggle button {
+      background: transparent;
+      border: none;
+      color: #aaa;
+      padding: 6px 16px;
+      border-radius: 4px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+      transition: 0.3s;
+    }
+    .lang-toggle button.active {
+      background: #e31e24;
+      color: #fff;
+    }
+    .lang-toggle button:hover:not(.active) {
+      background: #333;
+      color: #fff;
+    }
+
+    /* ===== ПРОМО-БЛОК ===== */
+    .promo {
+      min-height: 90vh;
+      display: flex;
+      align-items: center;
+      position: relative;
+      overflow: hidden;
+    }
+    .promo-content { max-width: 700px; }
+    .promo h1 {
+      font-size: 64px;
+      font-weight: 800;
+      line-height: 1.1;
+      margin-bottom: 20px;
+    }
+    .promo h1 .accent { color: #e31e24; }
+    .promo p {
+      font-size: 20px;
+      color: #bbb;
+      margin-bottom: 40px;
+    }
+    .btn {
+      display: inline-block;
+      padding: 16px 40px;
+      background: #e31e24;
+      color: #fff;
+      font-weight: 700;
+      font-size: 18px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: 0.3s;
+      text-decoration: none;
+    }
+    .btn:hover {
+      background: #b0151a;
+      transform: scale(1.05);
+    }
+
+    /* ===== ТОЧНЫЙ SVG-ЗУБР ===== */
+    .hatch {
+      position:absolute;
+      right:-2%;
+      bottom:4%;
+      width:min(610px,46vw);
+      height:auto;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      background:transparent;
+      border:none;
+      box-shadow:none;
+      z-index:5;
+      transform-origin:center bottom;
+      will-change:transform,opacity;
+      pointer-events:none;
+    }
+
+    .hatch-fixed {
+      width: 150px;
+      height: auto;
+      margin: 0 auto 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      opacity: 0;
+      transform-origin: center bottom;
+      will-change: transform, opacity;
+      pointer-events: none;
+    }
+
+    .exact-zubr {
+      display: block;
+      width: 100%;
+      height: auto;
+      overflow: visible;
+      transform-origin: 50% 80%;
+      transform-box: fill-box;
+      will-change: transform;
+    }
+
+    /* Внутри SVG сохранены исходные контуры и цвета зубра */
+    .exact-zubr .zubr-shadow,
+    .exact-zubr .zubr-art {
+      transform-box: fill-box;
+      transform-origin: center;
+    }
+
+    @media (max-width: 992px) {
+      .hatch {
+        width:min(500px,48vw);
+        right:-4%;
+        bottom:3%;
+      }
+      .hatch-fixed {
+        width: 120px;
+      }
+    }
+
+    @media (max-width: 600px) {
+      .hatch {
+        width:320px;
+        right:-95px;
+        bottom:1%;
+      }
+      .hatch-fixed {
+        width: 95px;
+      }
+    }
+
+
+    /* ===== ФАКТЫ ===== */
+    .facts {
+      background: #111;
+      border-top: 2px solid #222;
+      border-bottom: 2px solid #222;
+      padding: 60px 0;
+    }
+    .facts-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 30px;
+      text-align: center;
+    }
+    .fact-item { position:relative; min-height:190px; padding:28px 18px 24px; border:1px solid rgba(255,255,255,.08); border-radius:18px; background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012)); overflow:hidden; isolation:isolate; transition:transform .45s cubic-bezier(.2,.8,.2,1),border-color .45s,background .45s,box-shadow .45s; }
+    .fact-item:hover { transform:translateY(-9px); border-color:rgba(227,30,36,.55); background:linear-gradient(145deg,rgba(227,30,36,.11),rgba(255,255,255,.025)); box-shadow:0 18px 50px rgba(0,0,0,.32),0 0 30px rgba(227,30,36,.08); }
+    .fact-item .number { position:relative; z-index:2; font-size:clamp(40px,4vw,58px); line-height:1; font-weight:900; letter-spacing:-1px; color:#e31e24; text-shadow:0 0 24px rgba(227,30,36,.22); transition:transform .45s,text-shadow .45s; }
+    .fact-item:hover .number { transform:scale(1.08); text-shadow:0 0 34px rgba(227,30,36,.48); }
+    .fact-item .label { position:relative; z-index:2; max-width:180px; margin:13px auto 0; font-size:15px; line-height:1.45; font-weight:600; color:#b7b7b7; transition:color .35s,transform .35s; }
+    .fact-item:hover .label { color:#fff; transform:translateY(-2px); }
+
+
+/* ===== ОБНОВЛЁННЫЙ ДИЗАЙН УСЛУГ / ПОЧЕМУ МЫ ===== */
+.services-section{
+  position:relative;
+  overflow:hidden;
+  background:linear-gradient(180deg,#0a0a0a 0%,#101010 100%);
+}
+.services-section::before{
+  content:"01";
+  position:absolute;
+  right:-20px;
+  top:70px;
+  font-size:clamp(150px,22vw,320px);
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.09em;
+  color:rgba(255,255,255,.025);
+  pointer-events:none;
+}
+.section-kicker-pro{
+  display:flex;
+  align-items:center;
+  gap:14px;
+  margin-bottom:14px;
+  color:#e31e24;
+  font-size:11px;
+  font-weight:900;
+  letter-spacing:.22em;
+  text-transform:uppercase;
+}
+.section-kicker-pro::before{
+  content:"";
+  width:42px;
+  height:2px;
+  background:#e31e24;
+  box-shadow:0 0 14px rgba(227,30,36,.45);
+}
+.section-title-pro{
+  position:relative;
+  z-index:2;
+  font-size:clamp(42px,5.8vw,78px);
+  line-height:.92;
+  letter-spacing:-.065em;
+  font-weight:900;
+  margin:0;
+}
+.section-title-pro span{color:#e31e24}
+.services-grid-pro{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:22px;
+  margin-top:42px;
+}
+.service-card-pro{
+  position:relative;
+  min-height:300px;
+  padding:30px 28px 28px;
+  border:1px solid rgba(255,255,255,.10);
+  border-radius:20px;
+  background:
+    radial-gradient(circle at 85% 15%,rgba(227,30,36,.13),transparent 28%),
+    linear-gradient(145deg,rgba(255,255,255,.055),rgba(255,255,255,.015));
+  overflow:hidden;
+  isolation:isolate;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),border-color .45s,box-shadow .55s,background .45s;
+  transform-style:preserve-3d;
+}
+.service-card-pro::before{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:linear-gradient(120deg,transparent 20%,rgba(255,255,255,.08) 50%,transparent 80%);
+  transform:translateX(-120%);
+  transition:transform .8s ease;
+  pointer-events:none;
+}
+.service-card-pro::after{
+  content:"";
+  position:absolute;
+  left:0; top:0;
+  width:100%; height:3px;
+  background:linear-gradient(90deg,#e31e24,transparent 75%);
+  transform:scaleX(.25);
+  transform-origin:left;
+  transition:transform .55s ease;
+}
+.service-card-pro:hover{
+  transform:translateY(-12px) scale(1.015);
+  border-color:rgba(227,30,36,.52);
+  box-shadow:0 24px 70px rgba(0,0,0,.46),0 0 36px rgba(227,30,36,.10);
+  background:
+    radial-gradient(circle at 85% 15%,rgba(227,30,36,.18),transparent 30%),
+    linear-gradient(145deg,rgba(227,30,36,.085),rgba(255,255,255,.018));
+}
+.service-card-pro:hover::before{transform:translateX(120%)}
+.service-card-pro:hover::after{transform:scaleX(1)}
+.service-num-pro{
+  position:relative;
+  z-index:2;
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  width:48px;height:48px;
+  border-radius:14px;
+  border:1px solid rgba(227,30,36,.45);
+  color:#e31e24;
+  font-size:13px;
+  font-weight:900;
+  letter-spacing:.08em;
+  background:rgba(227,30,36,.06);
+  box-shadow:inset 0 0 18px rgba(227,30,36,.05);
+  transition:transform .45s ease,background .45s ease,color .45s ease;
+}
+.service-card-pro:hover .service-num-pro{
+  transform:rotate(-8deg) scale(1.08);
+  background:#e31e24;
+  color:#fff;
+}
+.service-card-pro h3{
+  position:relative; z-index:2;
+  margin:62px 0 14px;
+  font-size:26px;
+  line-height:1.05;
+  letter-spacing:-.035em;
+  transition:transform .4s ease,color .4s ease;
+}
+.service-card-pro:hover h3{transform:translateX(7px);color:#fff}
+.service-card-pro p{
+  position:relative; z-index:2;
+  color:#999;
+  line-height:1.65;
+  max-width:360px;
+  transition:color .4s ease,transform .4s ease;
+}
+.service-card-pro:hover p{color:#ddd;transform:translateX(7px)}
+.service-arrow-pro{
+  position:absolute;
+  right:24px; bottom:22px;
+  font-size:28px;
+  color:#555;
+  transition:transform .45s ease,color .45s ease;
+}
+.service-card-pro:hover .service-arrow-pro{transform:translate(5px,-5px);color:#e31e24}
+
+.why-section-pro{
+  position:relative;
+  overflow:hidden;
+  background:
+    radial-gradient(circle at 12% 20%,rgba(227,30,36,.11),transparent 24%),
+    linear-gradient(180deg,#0d0d0d,#090909);
+}
+.why-section-pro::after{
+  content:"WHY";
+  position:absolute;
+  right:-20px; bottom:-55px;
+  font-size:clamp(120px,19vw,300px);
+  font-weight:900;
+  letter-spacing:-.09em;
+  color:rgba(255,255,255,.02);
+  pointer-events:none;
+}
+.advantages-grid-pro{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:18px;
+  margin-top:42px;
+}
+.advantage-item-pro{
+  position:relative;
+  min-height:220px;
+  padding:28px;
+  display:grid;
+  grid-template-columns:64px minmax(0,1fr);
+  gap:22px;
+  align-items:start;
+  border:1px solid rgba(255,255,255,.09);
+  border-radius:18px;
+  background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+  overflow:hidden;
+  isolation:isolate;
+  transition:transform .55s cubic-bezier(.2,.8,.2,1),border-color .45s,box-shadow .55s,background .45s;
+  transform-style:preserve-3d;
+}
+.advantage-item-pro::before{
+  content:"";
+  position:absolute;
+  width:180px;height:180px;
+  left:-65px; top:-70px;
+  border-radius:50%;
+  border:1px solid rgba(227,30,36,.22);
+  box-shadow:0 0 0 18px rgba(227,30,36,.025),0 0 0 36px rgba(227,30,36,.015);
+  opacity:.8;
+  transition:transform .6s ease,opacity .45s ease;
+}
+.advantage-item-pro::after{
+  content:"";
+  position:absolute;
+  right:-30px; bottom:-35px;
+  width:120px;height:120px;
+  border:1px solid rgba(255,255,255,.06);
+  transform:rotate(45deg);
+  transition:transform .6s ease,border-color .5s ease;
+}
+.advantage-item-pro:hover{
+  transform:translateY(-9px) scale(1.012);
+  border-color:rgba(227,30,36,.48);
+  background:linear-gradient(145deg,rgba(227,30,36,.095),rgba(255,255,255,.018));
+  box-shadow:0 24px 65px rgba(0,0,0,.40),0 0 34px rgba(227,30,36,.08);
+}
+.advantage-item-pro:hover::before{transform:scale(1.22);opacity:1}
+.advantage-item-pro:hover::after{transform:rotate(45deg) scale(1.18);border-color:rgba(227,30,36,.25)}
+.adv-number-pro{
+  position:relative;z-index:2;
+  font-size:28px;
+  line-height:1;
+  font-weight:900;
+  color:#e31e24;
+  letter-spacing:.03em;
+  text-shadow:0 0 22px rgba(227,30,36,.22);
+  transition:transform .45s ease,text-shadow .45s ease;
+}
+.advantage-item-pro:hover .adv-number-pro{transform:translateY(-4px) scale(1.12);text-shadow:0 0 30px rgba(227,30,36,.55)}
+.advantage-content-pro{position:relative;z-index:2}
+.advantage-content-pro h4{
+  margin:0 0 12px;
+  font-size:24px;
+  line-height:1.05;
+  letter-spacing:-.03em;
+  transition:transform .4s ease,color .4s ease;
+}
+.advantage-content-pro p{color:#969696;line-height:1.65;transition:transform .4s ease,color .4s ease}
+.advantage-item-pro:hover h4{transform:translateX(6px);color:#fff}
+.advantage-item-pro:hover p{transform:translateX(6px);color:#ddd}
+
+@media(max-width:900px){
+ .services-grid-pro{grid-template-columns:1fr 1fr}
+ .advantages-grid-pro{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+ .services-grid-pro{grid-template-columns:1fr;gap:16px}
+ .advantages-grid-pro{gap:14px}
+ .service-card-pro{min-height:270px}
+ .advantage-item-pro{grid-template-columns:50px 1fr;padding:22px;gap:15px}
+ .advantage-content-pro h4{font-size:21px}
+}
+
+    /* ===== УСЛУГИ ===== */
+    .services-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 30px;
+      margin-top: 40px;
+    }
+    .service-card {
+      background: #1a1a1a;
+      padding: 30px;
+      border-radius: 8px;
+      border-left: 4px solid #e31e24;
+      transition: 0.3s;
+    }
+    .service-card:hover {
+      background: #222;
+      transform: translateY(-5px);
+    }
+    .service-card h3 {
+      font-size: 22px;
+      margin-bottom: 12px;
+    }
+    .service-card p { color: #aaa; line-height: 1.6; }
+
+    /* ===== ПРЕИМУЩЕСТВА ===== */
+    .advantages { background: #0d0d0d; }
+    .advantages-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 40px;
+      margin-top: 40px;
+    }
+    .advantage-item {
+      display: flex;
+      gap: 20px;
+      align-items: flex-start;
+    }
+    .advantage-item .icon { font-size: 48px; flex-shrink: 0; }
+    .advantage-item h4 { font-size: 22px; margin-bottom: 8px; }
+    .advantage-item p { color: #aaa; }
+
+
+    /* ===== ЕДИНЫЕ ЭФФЕКТЫ ДЛЯ УСЛУГ / ТЕХНИКИ / ПРЕИМУЩЕСТВ ===== */
+    .service-card, .advantage-item {
+      position:relative;
+      overflow:hidden;
+      isolation:isolate;
+      border:1px solid rgba(255,255,255,.08);
+      background:linear-gradient(145deg,rgba(255,255,255,.045),rgba(255,255,255,.012));
+      border-left:3px solid #e31e24;
+      transition:transform .45s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .45s,background .45s;
+    }
+    .service-card:hover, .advantage-item:hover {
+      transform:translateY(-9px) scale(1.015);
+      border-color:rgba(227,30,36,.55);
+      background:linear-gradient(145deg,rgba(227,30,36,.11),rgba(255,255,255,.025));
+      box-shadow:0 18px 50px rgba(0,0,0,.32),0 0 30px rgba(227,30,36,.08);
+    }
+    .service-card h3, .advantage-item h4 { position:relative; z-index:2; transition:transform .35s,color .35s,text-shadow .35s; }
+    .service-card p, .advantage-item p { position:relative; z-index:2; transition:transform .35s,color .35s; }
+    .service-card:hover h3, .advantage-item:hover h4 { color:#fff; transform:translateX(4px); text-shadow:0 0 18px rgba(227,30,36,.28); }
+    .service-card:hover p, .advantage-item:hover p { color:#ddd; transform:translateX(4px); }
+    .advantage-item { padding:30px; gap:20px; align-items:flex-start; }
+    .advantage-item .adv-number { position:relative; z-index:2; flex-shrink:0; font-size:28px; font-weight:900; color:#e31e24; letter-spacing:1px; transition:transform .4s,text-shadow .4s; }
+    .advantage-item:hover .adv-number { transform:scale(1.15); text-shadow:0 0 24px rgba(227,30,36,.5); }
+
+    /* ===== ОСНОВНОЙ ЗУБР: ПОЯВЛЕНИЕ + ПЛАВНОЕ ДВИЖЕНИЕ ===== */
+    #hatch1 { opacity:0; transform:translateY(70px) scale(.92); }
+    #hatch1 .exact-zubr { transform-origin:50% 80%; }
+
+
+    /* ===== ЗАЩИТА ГЛАВНОГО ЗУБРА ===== */
+    #hatch1 {
+      visibility: visible;
+    }
+    #hatch1 .exact-zubr {
+      visibility: visible;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      #hatch1, #hatch1 .exact-zubr, .service-card::before, .service-card::after, .advantage-item::before, .advantage-item::after { display:none !important; }
+    }
+
+
+    /* =========================================================
+       РАСШИРЕННАЯ ТЕХНИКА — ХАРАКТЕРИСТИКИ + ЭФФЕКТЫ
+       ========================================================= */
+
+    .equipment-enhanced{
+      position:relative;
+      overflow:hidden;
+      padding-top:96px;
+      padding-bottom:96px;
+      background:
+        radial-gradient(circle at 10% 0%, rgba(206,17,38,.09), transparent 28%),
+        radial-gradient(circle at 90% 100%, rgba(0,122,51,.07), transparent 24%),
+        #0b0b0b;
+    }
+
+    .equipment-enhanced::before{
+      content:"03";
+      position:absolute;
+      right:-24px;
+      top:44px;
+      font-size:clamp(160px,22vw,330px);
+      line-height:.8;
+      font-weight:900;
+      letter-spacing:-.1em;
+      color:rgba(255,255,255,.025);
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .equipment-enhanced-head{
+      position:relative;
+      z-index:2;
+      display:flex;
+      justify-content:space-between;
+      align-items:end;
+      gap:50px;
+      margin-bottom:42px;
+    }
+
+    .equipment-enhanced-kicker{
+      margin-bottom:15px;
+      color:#CE1126;
+      font-size:11px;
+      font-weight:900;
+      letter-spacing:.22em;
+      text-transform:uppercase;
+    }
+
+    .equipment-enhanced-title{
+      margin:0;
+      color:#fff;
+      font-size:clamp(50px,7vw,88px);
+      line-height:.88;
+      letter-spacing:-.07em;
+      font-weight:900;
+    }
+
+    .equipment-enhanced-title span{
+      color:#fff;
+    }
+
+    .equipment-enhanced-intro{
+      max-width:450px;
+      margin:0;
+      color:#9b9b9b;
+      font-size:16px;
+      line-height:1.7;
+    }
+
+    .equipment-enhanced-grid{
+      position:relative;
+      z-index:2;
+      display:grid;
+      grid-template-columns:repeat(3,minmax(0,1fr));
+      gap:22px;
+      perspective:1200px;
+    }
+
+    .equipment-enhanced-card{
+      position:relative;
+      min-width:0;
+      background:#151515;
+      border:1px solid rgba(255,255,255,.09);
+      overflow:hidden;
+      isolation:isolate;
+      transform:translateZ(0);
+      transition:
+        transform .6s cubic-bezier(.2,.8,.2,1),
+        border-color .45s ease,
+        box-shadow .6s ease;
+      box-shadow:0 14px 38px rgba(0,0,0,.24);
+    }
+
+    .equipment-enhanced-card:hover{
+      transform:translateY(-12px) rotateX(2deg) scale(1.012);
+      border-color:rgba(206,17,38,.58);
+      box-shadow:
+        0 30px 75px rgba(0,0,0,.45),
+        0 0 0 1px rgba(206,17,38,.08);
+      z-index:5;
+    }
+
+    .equipment-enhanced-photo{
+      position:relative;
+      height:375px;
+      overflow:hidden;
+      background:
+        linear-gradient(145deg,#fafafa 0%,#ededed 60%,#dfe0df 100%);
+    }
+
+    .equipment-enhanced-photo::before{
+      content:"";
+      position:absolute;
+      inset:0;
+      z-index:1;
+      background:
+        linear-gradient(180deg,rgba(255,255,255,.0) 42%,rgba(0,0,0,.64) 100%);
+      opacity:.4;
+      transition:opacity .5s ease;
+      pointer-events:none;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-photo::before{
+      opacity:.75;
+    }
+
+    .equipment-enhanced-photo img{
+      position:relative;
+      z-index:0;
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      padding:20px;
+      transition:
+        transform .9s cubic-bezier(.2,.8,.2,1),
+        filter .6s ease;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-photo img{
+      transform:scale(1.11) translateY(-4px);
+      filter:saturate(1.08) contrast(1.04);
+    }
+
+    .equipment-enhanced-number{
+      position:absolute;
+      left:18px;
+      top:18px;
+      z-index:8;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      width:44px;
+      height:44px;
+      border:1px solid rgba(206,17,38,.45);
+      background:rgba(255,255,255,.94);
+      color:#CE1126;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.06em;
+      transition:
+        transform .5s cubic-bezier(.2,.8,.2,1),
+        color .4s ease,
+        background .4s ease,
+        border-color .4s ease;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-number{
+      transform:rotate(-8deg) scale(1.12);
+      color:#fff;
+      background:#CE1126;
+      border-color:#CE1126;
+    }
+
+    .equipment-enhanced-status{
+      position:absolute;
+      right:18px;
+      top:18px;
+      z-index:8;
+      display:flex;
+      align-items:center;
+      gap:7px;
+      padding:8px 11px;
+      background:rgba(17,17,17,.82);
+      color:#fff;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.16em;
+      backdrop-filter:blur(8px);
+      transform:translateY(-10px);
+      opacity:0;
+      transition:
+        transform .5s ease,
+        opacity .45s ease;
+    }
+
+    .equipment-enhanced-status i{
+      width:6px;
+      height:6px;
+      border-radius:50%;
+      background:#007A33;
+      box-shadow:0 0 0 0 rgba(0,122,51,.45);
+      animation:equipmentPulse 2s infinite;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-status{
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    @keyframes equipmentPulse{
+      0%,100%{box-shadow:0 0 0 0 rgba(0,122,51,.40)}
+      50%{box-shadow:0 0 0 7px rgba(0,122,51,0)}
+    }
+
+    .equipment-enhanced-shine{
+      position:absolute;
+      inset:-20% -55%;
+      z-index:2;
+      width:34%;
+      background:linear-gradient(
+        90deg,
+        transparent,
+        rgba(255,255,255,.38),
+        transparent
+      );
+      transform:translateX(-230%) skewX(-18deg);
+      pointer-events:none;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-shine{
+      animation:equipmentShine 1.15s cubic-bezier(.2,.8,.2,1);
+    }
+
+    @keyframes equipmentShine{
+      to{transform:translateX(430%) skewX(-18deg)}
+    }
+
+    .equipment-enhanced-specs{
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:14px;
+      z-index:7;
+      padding:17px 17px 16px;
+      border:1px solid rgba(255,255,255,.12);
+      border-radius:15px;
+      background:rgba(9,9,9,.92);
+      color:#fff;
+      box-shadow:0 16px 40px rgba(0,0,0,.25);
+      backdrop-filter:blur(12px);
+      transform:translateY(118%);
+      opacity:0;
+      transition:
+        transform .65s cubic-bezier(.16,1,.3,1),
+        opacity .45s ease;
+      pointer-events:none;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-specs{
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    .equipment-enhanced-specs-head{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:12px;
+      margin-bottom:11px;
+      padding-bottom:10px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+    }
+
+    .equipment-enhanced-specs-head span{
+      color:#aaa;
+      font-size:9px;
+      font-weight:900;
+      letter-spacing:.18em;
+    }
+
+    .equipment-enhanced-specs-head b{
+      color:#CE1126;
+      font-size:10px;
+      letter-spacing:.08em;
+    }
+
+    .equipment-enhanced-spec{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-start;
+      gap:12px;
+      padding:7px 0;
+      border-bottom:1px solid rgba(255,255,255,.07);
+      font-size:11px;
+      line-height:1.35;
+    }
+
+    .equipment-enhanced-spec:last-of-type{
+      border-bottom:0;
+    }
+
+    .equipment-enhanced-spec span{
+      color:#a3a3a3;
+    }
+
+    .equipment-enhanced-spec strong{
+      color:#fff;
+      text-align:right;
+      white-space:nowrap;
+      font-weight:800;
+    }
+
+    .equipment-enhanced-meter{
+      margin-top:11px;
+      padding-top:10px;
+      border-top:1px solid rgba(255,255,255,.09);
+    }
+
+    .equipment-enhanced-meter > span{
+      display:block;
+      margin-bottom:7px;
+      color:#8d8d8d;
+      font-size:9px;
+      font-weight:800;
+      letter-spacing:.08em;
+      text-transform:uppercase;
+    }
+
+    .equipment-enhanced-meter > div{
+      height:4px;
+      overflow:hidden;
+      background:#292929;
+      border-radius:10px;
+    }
+
+    .equipment-enhanced-meter i{
+      display:block;
+      width:var(--value);
+      height:100%;
+      background:linear-gradient(90deg,#CE1126 0 70%,#007A33 70% 100%);
+      transform:scaleX(0);
+      transform-origin:left;
+      transition:transform .9s cubic-bezier(.16,1,.3,1) .18s;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-meter i{
+      transform:scaleX(1);
+    }
+
+    .equipment-enhanced-info{
+      position:relative;
+      display:flex;
+      align-items:flex-end;
+      justify-content:space-between;
+      gap:16px;
+      min-height:145px;
+      padding:22px 22px 23px;
+      background:#151515;
+    }
+
+    .equipment-enhanced-info h3{
+      margin:0 0 10px;
+      color:#fff;
+      font-size:24px;
+      line-height:1.02;
+      letter-spacing:-.035em;
+      transition:transform .45s ease,color .4s ease;
+    }
+
+    .equipment-enhanced-info p{
+      margin:0;
+      max-width:320px;
+      color:#8d8d8d;
+      font-size:12px;
+      line-height:1.6;
+      transition:transform .45s ease,color .4s ease;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-info h3{
+      transform:translateX(6px);
+      color:#fff;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-info p{
+      transform:translateX(6px);
+      color:#bcbcbc;
+    }
+
+    .equipment-enhanced-arrow{
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 42px;
+      width:42px;
+      height:42px;
+      border:1px solid rgba(255,255,255,.15);
+      color:#fff;
+      font-size:19px;
+      transition:
+        transform .5s ease,
+        background .4s ease,
+        color .4s ease,
+        border-color .4s ease;
+    }
+
+    .equipment-enhanced-card:hover .equipment-enhanced-arrow{
+      transform:translate(4px,-4px);
+      background:#CE1126;
+      color:#fff;
+      border-color:#CE1126;
+    }
+
+    @media(max-width:1000px){
+      .equipment-enhanced-grid{
+        grid-template-columns:1fr 1fr;
+      }
+      .equipment-enhanced-head{
+        align-items:flex-start;
+        flex-direction:column;
+        gap:20px;
+      }
+      .equipment-enhanced-intro{
+        max-width:650px;
+      }
+    }
+
+    @media(max-width:650px){
+      .equipment-enhanced{
+        padding-top:75px;
+        padding-bottom:75px;
+      }
+      .equipment-enhanced-grid{
+        grid-template-columns:1fr;
+        gap:16px;
+      }
+      .equipment-enhanced-photo{
+        height:340px;
+      }
+      .equipment-enhanced-info{
+        min-height:130px;
+      }
+      .equipment-enhanced-info h3{
+        font-size:22px;
+      }
+      .equipment-enhanced-specs{
+        left:10px;
+        right:10px;
+        bottom:10px;
+      }
+    }
+
+    /* ===== НАШИ ПРОЕКТЫ ===== */
+    .projects { background:#0b0b0b; overflow:hidden; }
+    .projects-head { display:flex; align-items:flex-end; justify-content:space-between; gap:30px; margin-bottom:42px; }
+    .projects-kicker { color:#e31e24; font-size:13px; font-weight:800; letter-spacing:.18em; text-transform:uppercase; margin-bottom:12px; }
+    .projects-title { font-size:clamp(38px,5vw,72px); line-height:.98; letter-spacing:-2px; max-width:720px; }
+    .projects-subtitle { color:#9e9e9e; max-width:430px; line-height:1.6; }
+    .projects-list { display:grid; grid-template-columns:repeat(12,1fr); gap:16px; }
+    .project-card { position:relative; min-height:410px; padding:28px; border:1px solid rgba(255,255,255,.1); border-radius:2px; overflow:hidden; background:#151515; isolation:isolate; transition:transform .55s cubic-bezier(.2,.8,.2,1),border-color .4s,box-shadow .55s; }
+    .project-card .project-image{
+      position:absolute;
+      inset:0;
+      width:100%;
+      height:100%;
+      object-fit:cover;
+      display:block;
+      z-index:0;
+      opacity:.92;
+      filter:saturate(.92) contrast(1.02);
+      transition:transform .8s cubic-bezier(.2,.8,.2,1),opacity .5s ease,filter .5s ease;
+      pointer-events:none;
+      user-select:none;
+    }
+    .project-card:hover .project-image{
+      transform:scale(1.06);
+      opacity:.94;
+      filter:saturate(1.05) contrast(1.04);
+    }
+
+    .project-card-hotel .project-image{
+      object-position:center 45%;
+    }
+    .project-card-hotel:hover .project-image{
+      transform:scale(1.08);
+    }
+
+    .project-card:nth-child(1){grid-column:span 7}.project-card:nth-child(2){grid-column:span 5}.project-card:nth-child(3){grid-column:span 12}.project-card:nth-child(4){grid-column:span 7}.project-card:nth-child(5){grid-column:span 12}
+    .project-card::before { content:""; position:absolute; inset:0; z-index:1; background:linear-gradient(145deg,rgba(227,30,36,.18),transparent 42%),linear-gradient(to top,rgba(0,0,0,.78),rgba(0,0,0,.05) 68%); transition:transform .8s ease,filter .5s; pointer-events:none; }
+    .project-card::after { content:""; position:absolute; inset:0; z-index:1; opacity:.18; background-image:linear-gradient(rgba(255,255,255,.08) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.08) 1px,transparent 1px); background-size:42px 42px; transform:perspective(500px) rotateX(55deg) scale(1.5) translateY(25%); transform-origin:bottom; pointer-events:none; }
+    .project-card:hover { transform:translateY(-8px); border-color:rgba(227,30,36,.65); box-shadow:0 24px 70px rgba(0,0,0,.45),0 0 36px rgba(227,30,36,.08); }
+    .project-card:hover::before { transform:scale(1.06); filter:saturate(1.12); }
+    .project-index { position:absolute; top:24px; right:26px; z-index:2; font-size:13px; color:#eee; letter-spacing:.1em; }
+    .project-card h3 { position:absolute; left:28px; right:28px; bottom:72px; z-index:2; font-size:clamp(25px,3vw,42px); line-height:1.02; letter-spacing:-1px; max-width:560px; }
+    .project-meta { position:absolute; left:28px; bottom:28px; z-index:2; display:flex; gap:12px; align-items:center; color:#aaa; font-size:13px; }
+    .project-meta::before { content:""; width:28px; height:2px; background:#e31e24; }
+    .projects-cta { display:inline-flex; margin-top:28px; align-items:center; gap:16px; color:#fff; text-decoration:none; font-weight:800; border-bottom:1px solid rgba(255,255,255,.35); padding-bottom:8px; transition:gap .35s,color .35s,border-color .35s; }
+    .projects-cta:hover { gap:25px; color:#e31e24; border-color:#e31e24; }
+
+
+    /* =========================================================
+       ТЕХНИКА — КАРТОЧКИ С PNG-ИЗОБРАЖЕНИЯМИ
+       В обычном состоянии: чистая карточка и фотография.
+       При наведении: техника увеличивается, появляется
+       затемнение и характеристики.
+       ========================================================= */
+
+    .equipment {
+      position: relative;
+      overflow: visible;
+    }
+
+    .equipment-intro {
+      color:#aaa;
+      max-width:760px;
+      line-height:1.7;
+      margin-bottom:34px;
+    }
+
+    .equipment-grid {
+      display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:28px;
+      align-items:start;
+    }
+
+    .equipment-card {
+      position:relative;
+      min-width:0;
+      overflow:hidden;
+      background:#fff;
+      color:#111;
+      border:1px solid #e8e8e8;
+      border-radius:18px;
+      padding:0 0 24px;
+      box-shadow:0 10px 30px rgba(0,0,0,.08);
+      transition:
+        transform .55s cubic-bezier(.2,.8,.2,1),
+        box-shadow .55s cubic-bezier(.2,.8,.2,1);
+      isolation:isolate;
+    }
+
+    .equipment-card:hover {
+      transform:translateY(-12px) scale(1.025);
+      box-shadow:
+        0 28px 70px rgba(0,0,0,.20),
+        0 0 0 1px rgba(227,30,36,.20);
+      z-index:5;
+    }
+
+    .equipment-photo {
+      position:relative;
+      height:270px;
+      margin:0;
+      overflow:hidden;
+      background:#f5f5f5;
+      border-radius:18px 18px 0 0;
+    }
+
+    .equipment-photo::after {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(
+          to bottom,
+          transparent 45%,
+          rgba(0,0,0,.58) 100%
+        );
+      opacity:0;
+      transition:opacity .45s ease;
+      pointer-events:none;
+    }
+
+    .equipment-card:hover .equipment-photo::after {
+      opacity:1;
+    }
+
+    .equipment-photo img {
+      display:block;
+      width:100%;
+      height:100%;
+      object-fit:contain;
+      padding:10px;
+      transition:
+        transform .7s cubic-bezier(.2,.8,.2,1),
+        filter .55s ease;
+    }
+
+    .equipment-card:hover .equipment-photo img {
+      transform:scale(1.14);
+      filter:saturate(1.08) contrast(1.03);
+    }
+
+    .equipment-number {
+      position:absolute;
+      top:18px;
+      left:18px;
+      z-index:3;
+      width:38px;
+      height:38px;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      border-radius:50%;
+      background:rgba(255,255,255,.94);
+      color:#e31e24;
+      font-size:12px;
+      font-weight:900;
+      letter-spacing:.05em;
+      box-shadow:0 8px 22px rgba(0,0,0,.12);
+      transition:
+        transform .45s ease,
+        background .45s ease,
+        color .45s ease;
+    }
+
+    .equipment-card:hover .equipment-number {
+      transform:scale(1.12) rotate(-8deg);
+      background:#e31e24;
+      color:#fff;
+    }
+
+    .equipment-title {
+      padding:20px 22px 0;
+    }
+
+    .equipment-title h3 {
+      margin:0;
+      color:#111;
+      font-size:23px;
+      line-height:1.15;
+      letter-spacing:-.3px;
+    }
+
+    .equipment-model {
+      display:block;
+      margin-top:7px;
+      color:#777;
+      font-size:12px;
+      font-weight:700;
+      letter-spacing:.12em;
+      text-transform:uppercase;
+    }
+
+    .equipment-specs {
+      position:absolute;
+      left:14px;
+      right:14px;
+      bottom:14px;
+      z-index:4;
+      padding:18px 18px 17px;
+      border-radius:14px;
+      background:rgba(10,10,10,.92);
+      color:#fff;
+      opacity:0;
+      transform:translateY(28px);
+      transition:
+        opacity .45s ease,
+        transform .55s cubic-bezier(.2,.8,.2,1);
+      pointer-events:none;
+      backdrop-filter:blur(8px);
+    }
+
+    .equipment-card:hover .equipment-specs {
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .equipment-specs h4 {
+      margin:0 0 11px;
+      color:#fff;
+      font-size:14px;
+      text-transform:uppercase;
+      letter-spacing:.12em;
+    }
+
+    .equipment-specs-list {
+      display:grid;
+      gap:7px;
+    }
+
+    .equipment-spec {
+      display:flex;
+      justify-content:space-between;
+      gap:15px;
+      padding-bottom:7px;
+      border-bottom:1px solid rgba(255,255,255,.10);
+      font-size:12px;
+      line-height:1.35;
+    }
+
+    .equipment-spec:last-child {
+      border-bottom:none;
+      padding-bottom:0;
+    }
+
+    .equipment-spec span:first-child {
+      color:#aaa;
+    }
+
+    .equipment-spec strong {
+      color:#fff;
+      text-align:right;
+      font-weight:800;
+    }
+
+    .equipment-hint {
+      margin:10px 22px 0;
+      color:#999;
+      font-size:12px;
+      transition:opacity .35s ease, transform .35s ease;
+    }
+
+    .equipment-card:hover .equipment-hint {
+      opacity:0;
+      transform:translateY(5px);
+    }
+
+    @media (max-width: 900px) {
+      .equipment-grid {
+        grid-template-columns:repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 600px) {
+      .equipment-grid {
+        grid-template-columns:1fr;
+      }
+
+      .equipment-photo {
+        height:250px;
+      }
+
+      .equipment-card:hover {
+        transform:translateY(-7px) scale(1.01);
+      }
+    }
+
+    /* ===== ФУТЕР В СТИЛЕ РЕФЕРЕНСА ===== */
+    footer {
+      position:relative;
+      overflow:hidden;
+      background:#303030;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:#fff;
+      padding:0;
+      text-align:left;
+    }
+    .footer-wrap {
+      position:relative;
+      max-width:none;
+      padding-left:0;
+      padding-right:0;
+      z-index:2;
+      display:grid;
+      grid-template-columns:1.15fr 1.15fr 1.05fr 1fr;
+      min-height:390px;
+    }
+    .footer-col {
+      padding:34px 34px 40px;
+      border-right:1px solid rgba(255,255,255,.14);
+    }
+    .footer-col:last-child { border-right:0; }
+    .footer-zubr {
+      width: 74px;
+      height: 68px;
+      flex: 0 0 74px;
+      display: block;
+      overflow: visible;
+      filter: drop-shadow(0 8px 16px rgba(0,0,0,.22));
+    }
+    .footer-zubr .zubr-shadow,
+    .footer-zubr .zubr-art {
+      transform: none !important;
+      animation: none !important;
+    }
+    .footer-social {
+      display:flex;
+      flex-direction:column;
+      gap:14px;
+      margin-bottom:26px;
+    }
+    .footer-social a {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:18px;
+      color:#fff;
+      text-decoration:none;
+      font-weight:600;
+      font-size:20px;
+      transition:color .25s ease, transform .25s ease;
+    }
+    .footer-social a:hover {
+      color:#ff2028;
+      transform:translateX(5px);
+    }
+    .footer-social .social-icon {
+      width:28px;
+      height:28px;
+      display:inline-flex;
+      align-items:center;
+      justify-content:center;
+      flex:0 0 28px;
+    }
+    .footer-social svg {
+      width:100%;
+      height:100%;
+      fill:currentColor;
+      stroke:currentColor;
+    }
+        .footer-brand {
+      display:flex;
+      align-items:flex-start;
+      gap:16px;
+      margin-bottom:76px;
+    }
+    .footer-mark {
+      width:82px;
+      min-width:82px;
+      height:58px;
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:42px;
+      line-height:1;
+      font-weight:800;
+      letter-spacing:-5px;
+      color:#fff;
+    }
+    .footer-mark::before {
+      content:"";
+      position:absolute;
+      width:2px; height:58px;
+      left:8px; top:0;
+      background:#fff;
+      transform:skewX(-16deg);
+      opacity:.95;
+    }
+    .footer-mark span { color:#e31e24; margin-left:6px; }
+    .footer-tagline {
+      max-width:220px;
+      font-size:16px;
+      line-height:1.35;
+      font-weight:600;
+      margin-top:10px;
+    }
+    .footer-links {
+      display:flex;
+      flex-direction:column;
+      gap:28px;
+    }
+    .footer-links a, .footer-contact a {
+      color:#fff;
+      text-decoration:none;
+      font-size:25px;
+      line-height:1.1;
+      font-weight:600;
+      transition:color .25s ease, transform .25s ease;
+      display:inline-block;
+    }
+    .footer-links a:hover, .footer-contact a:hover {
+      color:#e31e24;
+      transform:translateX(5px);
+    }
+    .footer-question h3 {
+      margin:0 0 28px;
+      font-size:24px;
+      line-height:1.35;
+    }
+    .footer-question p {
+      color:#aaa;
+      max-width:310px;
+      font-size:16px;
+      line-height:1.45;
+      margin:0 0 44px;
+    }
+    .footer-question .footer-btn {
+      display:flex;
+      justify-content:space-between;
+      align-items:center;
+      width:100%;
+      max-width:345px;
+      background:#e31e24;
+      color:#fff;
+      padding:23px 25px;
+      text-decoration:none;
+      font-size:18px;
+      font-weight:700;
+      transition:transform .25s ease, background .25s ease;
+    }
+    .footer-question .footer-btn:hover {
+      transform:translateY(-3px);
+      background:#f1262c;
+    }
+    .footer-contact {
+      position:relative;
+    }
+    .footer-social {
+      display:flex;
+      flex-direction:column;
+      gap:20px;
+      margin-bottom:38px;
+    }
+    .footer-social a {
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      color:#fff;
+      text-decoration:none;
+      font-size:20px;
+      font-weight:600;
+    }
+    .footer-social a span {
+      font-size:28px;
+      font-weight:300;
+      line-height:1;
+    }
+    .footer-phone {
+      display:block;
+      font-size:22px !important;
+      margin-bottom:24px;
+    }
+    .footer-email {
+      display:block;
+      font-size:20px !important;
+      margin-bottom:32px;
+    }
+    .footer-address {
+      color:#aaa;
+      font-size:16px;
+      line-height:1.4;
+      max-width:260px;
+    }
+    .footer-bottom {
+      position:relative;
+      z-index:3;
+      display:flex;
+      justify-content:space-between;
+      gap:20px;
+      padding:18px 34px 16px;
+      border-top:1px solid rgba(255,255,255,.08);
+      color:#aaa;
+      font-size:13px;
+    }
+    .footer-bottom a { color:#aaa; text-decoration:none; }
+    .footer-bottom a:hover { color:#fff; }
+
+    /* ===== АНИМАЦИЯ ПОЯВЛЕНИЯ ===== */
+    .fade-up {
+      opacity: 0;
+      transform: translateY(40px);
+      transition: opacity 0.6s, transform 0.6s;
+    }
+    .fade-up.visible {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+    /* ===== АДАПТИВНОСТЬ ===== */
+    @media (max-width: 992px) {
+      .facts-grid { grid-template-columns: repeat(2, 1fr); }
+      .services-grid { grid-template-columns: repeat(2, 1fr); }
+      .promo h1 { font-size: 44px; }
+    }
+    @media (max-width: 600px) {
+      .brand { width:100%; }
+      .header-zubr { width:36px; height:36px; flex-basis:36px; }
+      .logo { font-size:22px; letter-spacing:1px; }
+      .projects-head { flex-direction:column; align-items:flex-start; }
+      .projects-list { display:grid; grid-template-columns:1fr; }
+      .project-card:nth-child(1), .project-card:nth-child(2), .project-card:nth-child(3), .project-card:nth-child(4) { grid-column:span 1; }
+      .project-card { min-height:330px; }
+      header { flex-direction: column; align-items: flex-start; padding-bottom:24px; }
+      nav a { margin-left: 0; margin-right: 20px; }
+      nav { width:100%; justify-content:flex-start; flex-wrap:wrap; gap:16px 22px; margin-left:0; }
+      nav a { margin-left: 0; margin-right: 0; }
+      .footer-wrap { grid-template-columns:1fr; min-height:0; }
+      .footer-col { border-right:0; border-bottom:1px solid rgba(255,255,255,.14); padding:28px 24px; }
+      .footer-col:last-child { border-bottom:0; }
+      .footer-zubr { width:58px; height:54px; flex-basis:58px; }
+      .footer-brand { margin-bottom:42px; }
+      .footer-col:nth-child(2) .footer-links { margin-top:0 !important; }
+      .footer-links a { font-size:22px; }
+      .footer-question h3 { font-size:22px; }
+      .footer-watermark { font-size:25vw; bottom:20px; }
+      .footer-bottom { flex-direction:column; padding:16px 24px 18px; }
+      .lang-toggle { align-self: flex-start; margin-top: 10px; }
+      .promo h1 { font-size: 32px; }
+      .facts-grid { grid-template-columns: 1fr 1fr; }
+      .services-grid { grid-template-columns: 1fr; }
+      .advantages-grid { grid-template-columns: 1fr; }
+    }
+  
+    /* =========================================================
+       НОВАЯ СТАТИСТИКА — БОЛЬШАЯ ТИПОГРАФИКА
+       Визуальный принцип: крупные цифры, тонкие линии,
+       номера, асимметрия и scroll-reveal.
+       ========================================================= */
+
+    .facts-showcase {
+      position: relative;
+      min-height: 92vh;
+      padding: 72px 0 78px;
+      overflow: hidden;
+      background:
+        radial-gradient(circle at 82% 35%, rgba(227,30,36,.11), transparent 32%),
+        linear-gradient(180deg, #101010 0%, #0b0b0b 100%);
+      border-top: 1px solid rgba(255,255,255,.08);
+      border-bottom: 1px solid rgba(255,255,255,.08);
+    }
+
+    .facts-showcase::before {
+      content:"";
+      position:absolute;
+      inset:0;
+      background:
+        linear-gradient(90deg, rgba(255,255,255,.055) 1px, transparent 1px);
+      background-size: 25% 100%;
+      pointer-events:none;
+      opacity:.55;
+    }
+
+    .facts-showcase .container {
+      position:relative;
+      z-index:2;
+    }
+
+    .facts-bg-number {
+      position:absolute;
+      right:-2vw;
+      top:3vh;
+      font-size:clamp(150px, 22vw, 340px);
+      line-height:.8;
+      font-weight:900;
+      letter-spacing:-.08em;
+      color:rgba(255,255,255,.025);
+      pointer-events:none;
+      user-select:none;
+    }
+
+    .facts-intro {
+      max-width:760px;
+      margin-bottom:42px;
+      position:relative;
+    }
+
+    .facts-kicker {
+      display:flex;
+      align-items:center;
+      gap:14px;
+      margin-bottom:20px;
+      color:#aaa;
+      font-size:12px;
+      font-weight:800;
+      letter-spacing:.24em;
+    }
+
+    .facts-kicker::before {
+      content:"";
+      width:42px;
+      height:1px;
+      background:#e31e24;
+    }
+
+    .facts-intro h2 {
+      font-size:clamp(40px, 5.5vw, 72px);
+      line-height:.94;
+      letter-spacing:-.055em;
+      font-weight:900;
+      text-transform:uppercase;
+    }
+
+    .facts-intro h2 span {
+      color:#e31e24;
+    }
+
+    .facts-list {
+      display:flex;
+      flex-direction:column;
+    }
+
+    .fact-slide {
+      position:relative;
+      display:grid;
+      grid-template-columns:52px minmax(0, 1fr) 230px;
+      gap:22px;
+      align-items:end;
+      min-height:165px;
+      padding:22px 0 24px;
+      border-top:1px solid rgba(255,255,255,.18);
+      overflow:hidden;
+      transition:padding .6s cubic-bezier(.2,.8,.2,1);
+    }
+
+    .fact-slide:last-child {
+      border-bottom:1px solid rgba(255,255,255,.18);
+    }
+
+    .fact-slide::before {
+      content:"";
+      position:absolute;
+      left:0;
+      bottom:0;
+      width:0;
+      height:2px;
+      background:#e31e24;
+      transition:width 1s cubic-bezier(.16,1,.3,1);
+    }
+
+    .fact-slide::after {
+      content:"";
+      position:absolute;
+      left:-20%;
+      top:0;
+      width:20%;
+      height:100%;
+      background:linear-gradient(90deg, transparent, rgba(255,255,255,.08), transparent);
+      transform:skewX(-18deg);
+      transition:left 1.1s cubic-bezier(.16,1,.3,1);
+      pointer-events:none;
+    }
+
+    .fact-slide.is-visible::before {
+      width:100%;
+    }
+
+    .fact-slide.is-visible::after {
+      left:120%;
+    }
+
+    .fact-index {
+      align-self:start;
+      padding-top:8px;
+      font-size:14px;
+      font-weight:700;
+      color:#777;
+      letter-spacing:.12em;
+      transform:translateY(28px);
+      opacity:0;
+      transition:opacity .7s ease, transform .8s cubic-bezier(.16,1,.3,1);
+    }
+
+    .fact-slide.is-visible .fact-index {
+      opacity:1;
+      transform:translateY(0);
+    }
+
+    .fact-main {
+      min-width:0;
+    }
+
+    .fact-number {
+      font-size:clamp(62px, 8vw, 112px);
+      line-height:.78;
+      letter-spacing:-.08em;
+      font-weight:900;
+      color:#f4f4f4;
+      transform:translateY(70px);
+      opacity:0;
+      transition:
+        transform 1s cubic-bezier(.16,1,.3,1),
+        opacity .75s ease,
+        color .45s ease;
+    }
+
+    .fact-number small {
+      font-size:.42em;
+      letter-spacing:-.04em;
+    }
+
+    .fact-slide.is-visible .fact-number {
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    .fact-slide:hover .fact-number {
+      color:#e31e24;
+    }
+
+    .fact-line {
+      height:1px;
+      width:100%;
+      margin:16px 0 10px;
+      background:rgba(255,255,255,.25);
+      transform:scaleX(0);
+      transform-origin:left;
+      transition:transform 1s cubic-bezier(.16,1,.3,1) .15s;
+    }
+
+    .fact-slide.is-visible .fact-line {
+      transform:scaleX(1);
+    }
+
+    .fact-label {
+      display:inline-flex;
+      align-items:center;
+      gap:12px;
+      max-width:620px;
+      padding:8px 13px 7px;
+      border:1px solid rgba(255,255,255,.16);
+      border-left:3px solid #e31e24;
+      background:rgba(255,255,255,.035);
+      color:#f1f1f1;
+      font-size:clamp(13px, 1.15vw, 17px);
+      line-height:1.15;
+      font-weight:700;
+      letter-spacing:-.015em;
+      text-transform:uppercase;
+      transform:translateY(24px);
+      opacity:0;
+      transition:
+        transform .8s cubic-bezier(.16,1,.3,1) .18s,
+        opacity .65s ease .18s,
+        color .35s ease,
+        background .35s ease,
+        border-color .35s ease,
+        padding .35s ease;
+    }
+
+    .fact-label::before {
+      content:"↗";
+      color:#e31e24;
+      font-size:13px;
+      line-height:1;
+      transition:transform .35s ease;
+    }
+
+    .fact-slide.is-visible .fact-label {
+      transform:translateY(0);
+      opacity:1;
+    }
+
+    .fact-slide:hover .fact-label {
+      color:#fff;
+      background:rgba(227,30,36,.09);
+      border-color:rgba(227,30,36,.45);
+      padding-left:22px;
+    }
+
+    .fact-slide:hover .fact-label::before {
+      transform:translate(3px,-3px);
+    }
+
+    .fact-side {
+      padding-bottom:2px;
+      transform:translateX(45px);
+      opacity:0;
+      transition:
+        transform .9s cubic-bezier(.16,1,.3,1) .25s,
+        opacity .7s ease .25s;
+    }
+
+    .fact-slide.is-visible .fact-side {
+      transform:translateX(0);
+      opacity:1;
+    }
+
+    .fact-side span {
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      margin-bottom:14px;
+      padding:7px 10px;
+      border:1px solid rgba(227,30,36,.42);
+      color:#fff;
+      background:rgba(227,30,36,.06);
+      font-size:10px;
+      font-weight:900;
+      letter-spacing:.2em;
+      line-height:1;
+    }
+
+    .fact-side span b {
+      color:#e31e24;
+      font-size:10px;
+      letter-spacing:.05em;
+    }
+
+    .fact-side p {
+      color:#8f8f8f;
+      font-size:12px;
+      line-height:1.5;
+      max-width:220px;
+    }
+
+    .fact-slide:hover {
+      padding-left:18px;
+      padding-right:18px;
+      background:linear-gradient(90deg, rgba(227,30,36,.055), transparent 65%);
+    }
+
+    /* Убираем старые вращающиеся орбиты и точки ВЕЗДЕ */
+    .fact-item::before,
+    .fact-item::after,
+    .service-card::before,
+    .service-card::after,
+    .advantage-item::before,
+    .advantage-item::after {
+      display:none !important;
+      animation:none !important;
+    }
+
+    @media (max-width: 900px) {
+      .fact-slide {
+        grid-template-columns:48px minmax(0,1fr);
+        gap:18px;
+      }
+
+      .fact-side {
+        grid-column:2;
+        padding-top:12px;
+        max-width:500px;
+      }
+
+      .fact-number {
+        font-size:clamp(72px, 16vw, 130px);
+      }
+    }
+
+    @media (max-width: 600px) {
+      .facts-showcase {
+        min-height:auto;
+        padding:58px 0;
+      }
+
+      .facts-intro {
+        margin-bottom:32px;
+      }
+
+      .facts-intro h2 {
+        font-size:40px;
+      }
+
+      .fact-slide {
+        min-height:155px;
+        grid-template-columns:36px minmax(0,1fr);
+        gap:12px;
+        padding:22px 0;
+      }
+
+      .fact-index {
+        font-size:11px;
+      }
+
+      .fact-number {
+        font-size:clamp(54px, 16vw, 82px);
+      }
+
+      .fact-label {
+        display:flex;
+        max-width:100%;
+        font-size:13px;
+        padding:8px 10px;
+      }
+
+      .fact-side p {
+        font-size:12px;
+      }
+
+      .facts-showcase::before {
+        background-size:50% 100%;
+      }
+    }
+
+  
+
+    /* ===== ЗАЩИТА ГЛАВНОГО ЗУБРА ===== */
+    #hatch1 {
+      visibility: visible;
+    }
+    #hatch1 .exact-zubr {
+      visibility: visible;
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      .fact-slide,
+      .fact-number,
+      .fact-index,
+      .fact-label,
+      .fact-side,
+      .fact-line,
+      .fact-slide::before,
+      .fact-slide::after {
+        transition:none !important;
+        animation:none !important;
+      }
+    }
+
+  
+    /* ===== ФИНАЛЬНАЯ КОМПОНОВКА HERO ===== */
+    .promo-content {
+      position:relative;
+      z-index:7;
+      width:min(680px, 58%);
+    }
+
+    .promo h1 {
+      max-width:680px;
+    }
+
+    @media (max-width: 992px) {
+      .promo-content { width:min(620px, 62%); }
+      .hatch { opacity:.92; }
+    }
+
+    @media (max-width: 700px) {
+      .promo-content {
+        width:100%;
+        max-width:650px;
+      }
+      .promo h1,
+      .promo p {
+        position:relative;
+        z-index:8;
+      }
+      .hatch {
+        opacity:.22;
+        right:-85px;
+        width:340px;
+      }
+    }
+
+  
+    /* ===== ФОРМА ЗАЯВКИ ===== */
+    .request-modal{position:fixed;inset:0;z-index:99999;display:flex;align-items:center;justify-content:center;padding:18px;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);opacity:0;visibility:hidden;transition:.35s ease}
+    .request-modal.active{opacity:1;visibility:visible}
+    .request-box{position:relative;width:min(760px,100%);max-height:92vh;overflow:auto;background:#111;border:1px solid rgba(255,255,255,.12);border-radius:24px;box-shadow:0 30px 100px rgba(0,0,0,.6);transform:translateY(20px) scale(.97);transition:.4s cubic-bezier(.2,.8,.2,1)}
+    .request-modal.active .request-box{transform:translateY(0) scale(1)}
+    .request-close-x{position:absolute;top:14px;right:14px;width:42px;height:42px;border:1px solid rgba(255,255,255,.12);border-radius:12px;background:#1b1b1b;color:#fff;font-size:24px;cursor:pointer;z-index:2}
+    .request-head{padding:28px 30px 18px;border-bottom:1px solid rgba(255,255,255,.08)}
+    .request-kicker{color:#e31e24;font-size:11px;font-weight:900;letter-spacing:.2em;margin-bottom:10px}
+    .request-head h2{font-size:clamp(32px,5vw,48px);line-height:.95;margin:0}
+    .request-head p{color:#999;line-height:1.5;margin-top:10px}
+    .request-form{padding:24px 30px 30px}
+    .request-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:15px}
+    .request-field{display:grid;gap:7px}
+    .request-field.full{grid-column:1/-1}
+    .request-field label{font-size:12px;color:#bbb;font-weight:800}
+    .request-field input,.request-field textarea{width:100%;background:#0b0b0b;border:1px solid rgba(255,255,255,.1);border-radius:12px;color:#fff;padding:13px 14px;font:inherit;outline:none}
+    .request-field input:focus,.request-field textarea:focus{border-color:#e31e24;box-shadow:0 0 0 4px rgba(227,30,36,.1)}
+    .request-field textarea{min-height:140px;resize:vertical}
+    .request-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:18px}
+    .request-close,.request-submit{min-height:48px;padding:0 20px;border-radius:12px;font:inherit;font-weight:900;cursor:pointer}
+    .request-close{background:#1b1b1b;border:1px solid rgba(255,255,255,.12);color:#ddd}
+    .request-submit{background:#e31e24;border:1px solid #e31e24;color:#fff}
+    .request-status{min-height:18px;margin-top:12px;color:#9c9c9c;font-size:12px}
+    @media(max-width:600px){.request-grid{grid-template-columns:1fr}.request-field.full{grid-column:auto}.request-form,.request-head{padding-left:20px;padding-right:20px}.request-actions{flex-direction:column-reverse}.request-close,.request-submit{width:100%}}
+
+
+@media(max-width:900px){
+  .container{width:min(calc(100% - 32px),1200px);padding:0}
+  header{padding:14px 0}
+  .logo{font-size:23px}
+  .promo{min-height:720px;padding:92px 0 60px}
+  .promo h1{font-size:clamp(44px,9vw,70px)}
+  .promo p{font-size:18px;line-height:1.55}
+  .hatch{width:min(510px,62vw);right:-6%;bottom:-1%}
+  .hatch-fixed{width:130px}
+  .facts-grid,.services-grid,.services-grid-pro{grid-template-columns:repeat(2,1fr)}
+  .advantages-grid-pro,.advantages-grid{grid-template-columns:1fr}
+  .projects-head{align-items:flex-start;flex-direction:column}
+  .projects-list{grid-template-columns:repeat(2,1fr)!important}
+  .project-card:nth-child(n){grid-column:span 1!important;min-height:360px}
+  .equipment-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .footer-wrap{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:700px){
+  header{position:relative;padding:10px 0}
+  header .mobile-menu-toggle{display:flex}
+  header nav{position:absolute;left:16px;right:16px;top:calc(100% + 6px);display:flex;flex-direction:column;align-items:stretch;gap:4px;padding:8px;margin:0;background:rgba(18,18,18,.98);border:1px solid rgba(255,255,255,.10);border-radius:14px;box-shadow:0 24px 60px rgba(0,0,0,.45);max-height:0;overflow:hidden;opacity:0;visibility:hidden;transform:translateY(-8px);transition:.35s;z-index:1004}
+  header nav.mobile-open{max-height:420px;opacity:1;visibility:visible;transform:none}
+  header nav a{padding:13px 12px;width:100%}
+  .promo{min-height:690px;padding:72px 0 50px}
+  .promo h1{font-size:clamp(36px,11vw,54px);line-height:1}
+  .promo p{font-size:16px}
+  .btn{width:100%;text-align:center}
+  .hatch{width:390px;right:-112px;bottom:-12px}
+  .hatch-fixed{width:100px}
+  .facts-grid,.services-grid,.services-grid-pro,.advantages-grid-pro,.advantages-grid,.projects-list,.equipment-grid{grid-template-columns:1fr!important}
+  .service-card,.service-card-pro{min-height:260px}
+  .advantage-item-pro{grid-template-columns:50px 1fr;padding:22px}
+  .project-card:nth-child(n){min-height:320px}
+  .equipment-card{border-radius:15px}
+  .equipment-photo{height:245px!important}
+  .equipment-specs{opacity:1;transform:none;position:relative;left:auto;right:auto;bottom:auto;margin:14px 14px 0;border-radius:12px}
+  .equipment-hint{display:none}
+  .footer-wrap{grid-template-columns:1fr;min-height:0}
+  .footer-col{border-right:0;border-bottom:1px solid rgba(255,255,255,.12)}
+  .footer-col:last-child{border-bottom:0}
+  .footer-bottom{flex-direction:column;align-items:flex-start}
+}
+
+</style>
+</head>
+<body>
+
+  <!-- Фоновая сетка -->
+  <div class="grid-bg"></div>
+
+  <!-- ШАПКА -->
+  <header class="container">
+    <div class="brand">
+      <svg class="header-zubr" viewBox="0 0 535 506" xmlns="http://www.w3.org/2000/svg" aria-label="Зубр">
+        <g class="zubr-shadow">
+<path fill="#bdbdbd" d="M 203.0 460.0 L 202.0 462.0 L 206.0 462.0 L 204.0 461.0 Z
+M 57.0 342.0 L 61.0 357.0 L 71.0 362.0 L 75.0 366.0 L 73.0 369.0 L 75.0 367.0 L 81.0 373.0 L 80.0 375.0 L 85.0 379.0 L 101.0 400.0 L 102.0 407.0 L 97.0 414.0 L 90.0 421.0 L 89.0 420.0 L 90.0 421.0 L 86.0 425.0 L 84.0 425.0 L 85.0 426.0 L 70.0 441.0 L 69.0 444.0 L 66.0 445.0 L 64.0 449.0 L 56.0 457.0 L 54.0 457.0 L 52.0 461.0 L 51.0 460.0 L 50.0 463.0 L 45.0 468.0 L 44.0 472.0 L 44.0 487.0 L 45.0 488.0 L 57.0 473.0 L 82.0 447.0 L 83.0 444.0 L 96.0 432.0 L 118.0 407.0 L 118.0 405.0 L 114.0 401.0 L 78.0 351.0 L 66.0 344.0 L 58.0 343.0 Z
+M 57.0 324.0 L 57.0 329.0 L 64.0 331.0 L 74.0 330.0 L 74.0 328.0 L 67.0 325.0 L 58.0 325.0 Z
+M 69.0 330.0 L 70.0 329.0 L 73.0 330.0 L 70.0 331.0 Z
+M 64.0 330.0 L 65.0 329.0 L 68.0 330.0 L 65.0 331.0 Z
+M 430.0 272.0 L 429.0 273.0 L 433.0 280.0 L 433.0 284.0 L 437.0 293.0 L 438.0 301.0 L 442.0 307.0 L 442.0 312.0 L 445.0 316.0 L 447.0 328.0 L 452.0 336.0 L 452.0 341.0 L 453.0 342.0 L 457.0 340.0 L 463.0 340.0 L 473.0 365.0 L 477.0 372.0 L 477.0 375.0 L 480.0 380.0 L 480.0 383.0 L 491.0 413.0 L 498.0 441.0 L 499.0 454.0 L 503.0 464.0 L 500.0 488.0 L 498.0 493.0 L 489.0 493.0 L 488.0 494.0 L 457.0 494.0 L 455.0 493.0 L 454.0 494.0 L 448.0 494.0 L 445.0 492.0 L 446.0 482.0 L 449.0 473.0 L 461.0 460.0 L 459.0 442.0 L 452.0 417.0 L 445.0 403.0 L 442.0 401.0 L 440.0 396.0 L 434.0 390.0 L 423.0 390.0 L 422.0 389.0 L 407.0 388.0 L 404.0 390.0 L 400.0 400.0 L 390.0 413.0 L 371.0 432.0 L 341.0 458.0 L 339.0 457.0 L 338.0 447.0 L 335.0 448.0 L 327.0 456.0 L 326.0 463.0 L 336.0 483.0 L 339.0 491.0 L 338.0 493.0 L 241.0 493.0 L 240.0 494.0 L 209.0 493.0 L 208.0 490.0 L 212.0 483.0 L 212.0 481.0 L 222.0 465.0 L 228.0 460.0 L 243.0 453.0 L 246.0 449.0 L 243.0 445.0 L 233.0 440.0 L 226.0 449.0 L 224.0 449.0 L 202.0 438.0 L 197.0 437.0 L 190.0 443.0 L 174.0 443.0 L 173.0 444.0 L 157.0 445.0 L 155.0 447.0 L 153.0 447.0 L 150.0 453.0 L 143.0 460.0 L 138.0 463.0 L 135.0 463.0 L 131.0 459.0 L 129.0 459.0 L 124.0 467.0 L 124.0 472.0 L 131.0 487.0 L 131.0 493.0 L 130.0 494.0 L 113.0 494.0 L 112.0 493.0 L 110.0 494.0 L 103.0 494.0 L 102.0 493.0 L 99.0 494.0 L 98.0 493.0 L 63.0 493.0 L 62.0 494.0 L 55.0 494.0 L 54.0 493.0 L 46.0 493.0 L 46.0 495.0 L 51.0 501.0 L 70.0 501.0 L 71.0 502.0 L 70.0 503.0 L 79.0 503.0 L 87.0 501.0 L 133.0 501.0 L 140.0 492.0 L 141.0 489.0 L 140.0 480.0 L 142.0 478.0 L 142.0 471.0 L 145.0 468.0 L 149.0 468.0 L 154.0 466.0 L 155.0 464.0 L 158.0 463.0 L 157.0 462.0 L 165.0 457.0 L 169.0 456.0 L 187.0 456.0 L 197.0 451.0 L 200.0 453.0 L 204.0 453.0 L 211.0 457.0 L 210.0 462.0 L 207.0 467.0 L 205.0 468.0 L 206.0 469.0 L 197.0 483.0 L 198.0 495.0 L 201.0 501.0 L 206.0 500.0 L 218.0 500.0 L 219.0 501.0 L 318.0 500.0 L 319.0 502.0 L 322.0 502.0 L 323.0 500.0 L 328.0 500.0 L 330.0 502.0 L 331.0 500.0 L 339.0 500.0 L 345.0 492.0 L 347.0 484.0 L 347.0 480.0 L 345.0 477.0 L 345.0 474.0 L 343.0 472.0 L 346.0 469.0 L 344.0 461.0 L 348.0 457.0 L 357.0 457.0 L 361.0 456.0 L 363.0 454.0 L 364.0 455.0 L 372.0 446.0 L 377.0 446.0 L 384.0 439.0 L 385.0 436.0 L 384.0 434.0 L 388.0 431.0 L 387.0 430.0 L 390.0 429.0 L 416.0 403.0 L 428.0 403.0 L 433.0 407.0 L 432.0 408.0 L 437.0 410.0 L 437.0 412.0 L 441.0 417.0 L 446.0 432.0 L 446.0 437.0 L 449.0 446.0 L 449.0 453.0 L 447.0 455.0 L 446.0 459.0 L 441.0 465.0 L 441.0 468.0 L 438.0 474.0 L 438.0 478.0 L 436.0 482.0 L 436.0 486.0 L 433.0 487.0 L 434.0 489.0 L 432.0 492.0 L 434.0 499.0 L 435.0 500.0 L 510.0 500.0 L 512.0 497.0 L 512.0 492.0 L 510.0 487.0 L 511.0 486.0 L 515.0 487.0 L 515.0 473.0 L 514.0 472.0 L 514.0 461.0 L 512.0 455.0 L 512.0 443.0 L 507.0 431.0 L 508.0 429.0 L 506.0 426.0 L 504.0 417.0 L 502.0 415.0 L 501.0 409.0 L 498.0 404.0 L 499.0 402.0 L 497.0 401.0 L 497.0 397.0 L 494.0 392.0 L 492.0 382.0 L 489.0 378.0 L 489.0 374.0 L 487.0 373.0 L 488.0 371.0 L 486.0 370.0 L 486.0 366.0 L 483.0 362.0 L 481.0 353.0 L 479.0 350.0 L 479.0 345.0 L 476.0 343.0 L 475.0 337.0 L 472.0 332.0 L 472.0 329.0 L 467.0 324.0 L 459.0 324.0 L 457.0 322.0 L 458.0 319.0 L 457.0 320.0 L 455.0 318.0 L 455.0 313.0 L 453.0 311.0 L 451.0 305.0 L 452.0 303.0 L 454.0 303.0 L 452.0 303.0 L 449.0 298.0 L 450.0 295.0 L 453.0 297.0 L 452.0 298.0 L 453.0 299.0 L 455.0 296.0 L 459.0 297.0 L 454.0 282.0 L 445.0 280.0 L 431.0 273.0 Z
+M 381.0 437.0 L 382.0 436.0 L 383.0 437.0 L 382.0 439.0 L 381.0 438.0 Z
+M 382.0 436.0 L 383.0 435.0 L 385.0 436.0 L 383.0 437.0 Z
+M 438.0 249.0 L 438.0 251.0 L 441.0 252.0 L 439.0 249.0 Z
+M 248.0 37.0 L 243.0 39.0 L 241.0 38.0 L 240.0 40.0 L 238.0 38.0 L 232.0 38.0 L 235.0 41.0 L 232.0 44.0 L 231.0 43.0 L 225.0 48.0 L 219.0 49.0 L 217.0 52.0 L 212.0 55.0 L 209.0 54.0 L 205.0 59.0 L 202.0 58.0 L 199.0 61.0 L 197.0 61.0 L 195.0 58.0 L 189.0 59.0 L 182.0 66.0 L 180.0 70.0 L 176.0 73.0 L 175.0 77.0 L 173.0 79.0 L 171.0 79.0 L 168.0 86.0 L 167.0 85.0 L 164.0 92.0 L 155.0 103.0 L 151.0 110.0 L 148.0 112.0 L 148.0 114.0 L 143.0 118.0 L 136.0 118.0 L 132.0 120.0 L 130.0 125.0 L 127.0 128.0 L 128.0 129.0 L 127.0 131.0 L 123.0 132.0 L 125.0 136.0 L 120.0 145.0 L 120.0 147.0 L 118.0 149.0 L 114.0 159.0 L 113.0 158.0 L 114.0 160.0 L 111.0 164.0 L 110.0 163.0 L 111.0 165.0 L 110.0 170.0 L 104.0 179.0 L 105.0 180.0 L 101.0 190.0 L 98.0 193.0 L 96.0 192.0 L 93.0 194.0 L 87.0 195.0 L 85.0 197.0 L 82.0 216.0 L 80.0 220.0 L 81.0 226.0 L 80.0 229.0 L 78.0 230.0 L 79.0 236.0 L 75.0 256.0 L 74.0 270.0 L 72.0 276.0 L 72.0 286.0 L 70.0 292.0 L 70.0 298.0 L 65.0 305.0 L 63.0 304.0 L 59.0 305.0 L 58.0 317.0 L 57.0 318.0 L 74.0 318.0 L 76.0 314.0 L 79.0 303.0 L 79.0 295.0 L 82.0 288.0 L 82.0 282.0 L 85.0 271.0 L 85.0 255.0 L 89.0 241.0 L 89.0 232.0 L 91.0 228.0 L 92.0 214.0 L 94.0 213.0 L 98.0 215.0 L 102.0 212.0 L 104.0 207.0 L 104.0 203.0 L 108.0 199.0 L 111.0 192.0 L 111.0 188.0 L 116.0 181.0 L 117.0 175.0 L 123.0 165.0 L 126.0 158.0 L 126.0 155.0 L 129.0 152.0 L 134.0 140.0 L 136.0 139.0 L 140.0 143.0 L 151.0 130.0 L 153.0 125.0 L 158.0 120.0 L 160.0 115.0 L 163.0 113.0 L 176.0 95.0 L 177.0 92.0 L 188.0 79.0 L 193.0 79.0 L 196.0 77.0 L 199.0 77.0 L 204.0 73.0 L 208.0 72.0 L 244.0 51.0 L 247.0 51.0 L 252.0 60.0 L 260.0 66.0 L 263.0 70.0 L 265.0 70.0 L 268.0 73.0 L 268.0 75.0 L 272.0 79.0 L 275.0 80.0 L 287.0 92.0 L 292.0 100.0 L 304.0 111.0 L 306.0 116.0 L 306.0 121.0 L 312.0 131.0 L 318.0 138.0 L 319.0 142.0 L 321.0 143.0 L 327.0 154.0 L 331.0 157.0 L 331.0 160.0 L 339.0 173.0 L 343.0 176.0 L 346.0 184.0 L 352.0 190.0 L 352.0 192.0 L 356.0 197.0 L 356.0 199.0 L 361.0 206.0 L 365.0 209.0 L 365.0 211.0 L 391.0 235.0 L 410.0 251.0 L 414.0 252.0 L 421.0 259.0 L 440.0 269.0 L 450.0 271.0 L 449.0 266.0 L 442.0 255.0 L 432.0 251.0 L 429.0 248.0 L 427.0 248.0 L 426.0 247.0 L 427.0 246.0 L 426.0 247.0 L 425.0 245.0 L 420.0 243.0 L 413.0 236.0 L 401.0 227.0 L 399.0 224.0 L 395.0 222.0 L 391.0 217.0 L 389.0 217.0 L 377.0 206.0 L 378.0 205.0 L 377.0 206.0 L 373.0 202.0 L 370.0 196.0 L 369.0 190.0 L 366.0 188.0 L 364.0 190.0 L 361.0 187.0 L 359.0 183.0 L 361.0 182.0 L 355.0 177.0 L 351.0 171.0 L 350.0 167.0 L 345.0 162.0 L 345.0 160.0 L 343.0 158.0 L 344.0 157.0 L 342.0 155.0 L 341.0 156.0 L 339.0 151.0 L 336.0 148.0 L 337.0 144.0 L 335.0 145.0 L 334.0 142.0 L 330.0 138.0 L 329.0 132.0 L 324.0 127.0 L 324.0 124.0 L 322.0 120.0 L 322.0 116.0 L 324.0 114.0 L 322.0 116.0 L 321.0 112.0 L 320.0 113.0 L 318.0 109.0 L 290.0 81.0 L 286.0 76.0 L 286.0 74.0 L 284.0 75.0 L 283.0 74.0 L 284.0 73.0 L 277.0 68.0 L 266.0 57.0 L 267.0 56.0 L 263.0 53.0 L 262.0 51.0 L 263.0 48.0 L 260.0 47.0 L 258.0 40.0 L 255.0 37.0 L 249.0 37.0 Z
+M 367.0 193.0 L 368.0 192.0 L 369.0 193.0 L 368.0 195.0 L 367.0 194.0 Z
+M 201.0 59.0 L 202.0 58.0 L 204.0 59.0 L 202.0 60.0 Z" fill-rule="evenodd"/>
+</g>
+<g class="zubr-art">
+<path fill="#f60000" d="M 268.0 442.0 L 266.0 443.0 L 264.0 448.0 L 259.0 453.0 L 256.0 454.0 L 251.0 459.0 L 227.0 474.0 L 224.0 481.0 L 224.0 485.0 L 230.0 487.0 L 231.0 486.0 L 243.0 486.0 L 254.0 473.0 L 257.0 471.0 L 273.0 449.0 L 274.0 444.0 L 269.0 442.0 Z
+M 124.0 419.0 L 111.0 431.0 L 96.0 449.0 L 82.0 463.0 L 71.0 477.0 L 72.0 479.0 L 71.0 482.0 L 72.0 483.0 L 110.0 483.0 L 115.0 479.0 L 113.0 460.0 L 122.0 452.0 L 133.0 439.0 L 137.0 439.0 L 141.0 441.0 L 144.0 441.0 L 146.0 439.0 L 146.0 432.0 L 141.0 427.0 L 135.0 424.0 L 132.0 421.0 L 128.0 419.0 L 125.0 419.0 Z
+M 95.0 246.0 L 94.0 266.0 L 96.0 256.0 L 96.0 249.0 L 95.0 248.0 L 96.0 247.0 Z
+M 128.0 174.0 L 126.0 176.0 L 125.0 182.0 L 122.0 184.0 L 120.0 188.0 L 120.0 190.0 L 110.0 211.0 L 108.0 213.0 L 107.0 217.0 L 98.0 231.0 L 98.0 234.0 L 96.0 238.0 L 96.0 244.0 L 97.0 245.0 L 100.0 241.0 L 106.0 239.0 L 114.0 226.0 L 126.0 189.0 L 127.0 182.0 L 129.0 179.0 L 129.0 175.0 Z
+M 178.0 107.0 L 173.0 111.0 L 171.0 117.0 L 168.0 118.0 L 165.0 124.0 L 158.0 132.0 L 157.0 136.0 L 152.0 140.0 L 148.0 146.0 L 139.0 155.0 L 137.0 155.0 L 134.0 158.0 L 134.0 163.0 L 131.0 165.0 L 131.0 168.0 L 134.0 167.0 L 136.0 164.0 L 146.0 166.0 L 150.0 159.0 L 150.0 157.0 L 173.0 120.0 L 178.0 108.0 Z
+M 242.0 63.0 L 224.0 76.0 L 223.0 75.0 L 224.0 72.0 L 222.0 74.0 L 217.0 75.0 L 210.0 80.0 L 200.0 84.0 L 197.0 87.0 L 194.0 88.0 L 193.0 90.0 L 190.0 91.0 L 191.0 92.0 L 190.0 95.0 L 194.0 99.0 L 201.0 96.0 L 209.0 89.0 L 211.0 90.0 L 199.0 104.0 L 195.0 107.0 L 185.0 111.0 L 178.0 119.0 L 177.0 123.0 L 174.0 126.0 L 162.0 148.0 L 162.0 150.0 L 147.0 176.0 L 142.0 182.0 L 137.0 179.0 L 134.0 183.0 L 130.0 193.0 L 130.0 196.0 L 120.0 219.0 L 110.0 250.0 L 105.0 255.0 L 103.0 259.0 L 102.0 335.0 L 104.0 344.0 L 115.0 358.0 L 121.0 371.0 L 120.0 372.0 L 107.0 358.0 L 100.0 348.0 L 100.0 346.0 L 95.0 338.0 L 94.0 330.0 L 92.0 325.0 L 93.0 276.0 L 94.0 275.0 L 93.0 271.0 L 91.0 272.0 L 90.0 295.0 L 85.0 315.0 L 85.0 322.0 L 84.0 323.0 L 84.0 338.0 L 91.0 353.0 L 98.0 363.0 L 105.0 370.0 L 107.0 374.0 L 114.0 381.0 L 119.0 389.0 L 125.0 395.0 L 130.0 403.0 L 138.0 411.0 L 151.0 418.0 L 157.0 424.0 L 160.0 429.0 L 164.0 430.0 L 177.0 430.0 L 179.0 429.0 L 183.0 422.0 L 195.0 409.0 L 199.0 396.0 L 199.0 373.0 L 198.0 368.0 L 194.0 367.0 L 192.0 365.0 L 196.0 351.0 L 199.0 348.0 L 202.0 347.0 L 206.0 348.0 L 208.0 352.0 L 209.0 396.0 L 208.0 397.0 L 207.0 407.0 L 203.0 419.0 L 203.0 422.0 L 208.0 426.0 L 213.0 428.0 L 218.0 428.0 L 219.0 425.0 L 221.0 423.0 L 233.0 426.0 L 251.0 435.0 L 258.0 428.0 L 284.0 428.0 L 291.0 425.0 L 298.0 418.0 L 301.0 412.0 L 301.0 406.0 L 299.0 404.0 L 283.0 397.0 L 280.0 394.0 L 281.0 392.0 L 287.0 391.0 L 288.0 392.0 L 313.0 394.0 L 323.0 396.0 L 324.0 400.0 L 318.0 410.0 L 318.0 412.0 L 314.0 416.0 L 311.0 422.0 L 305.0 428.0 L 305.0 430.0 L 267.0 477.0 L 268.0 481.0 L 270.0 482.0 L 288.0 482.0 L 289.0 483.0 L 313.0 483.0 L 317.0 482.0 L 320.0 479.0 L 313.0 463.0 L 313.0 457.0 L 316.0 450.0 L 329.0 436.0 L 343.0 424.0 L 345.0 424.0 L 348.0 428.0 L 352.0 430.0 L 354.0 429.0 L 366.0 417.0 L 373.0 412.0 L 383.0 402.0 L 388.0 395.0 L 387.0 386.0 L 385.0 385.0 L 385.0 381.0 L 362.0 334.0 L 362.0 332.0 L 357.0 323.0 L 357.0 320.0 L 355.0 318.0 L 354.0 314.0 L 354.0 304.0 L 355.0 303.0 L 354.0 292.0 L 346.0 273.0 L 344.0 271.0 L 344.0 269.0 L 330.0 242.0 L 328.0 235.0 L 328.0 222.0 L 325.0 214.0 L 326.0 211.0 L 332.0 218.0 L 334.0 224.0 L 337.0 228.0 L 339.0 234.0 L 340.0 244.0 L 345.0 258.0 L 369.0 300.0 L 370.0 303.0 L 369.0 320.0 L 372.0 324.0 L 380.0 344.0 L 393.0 371.0 L 397.0 375.0 L 403.0 378.0 L 406.0 377.0 L 407.0 378.0 L 430.0 378.0 L 440.0 382.0 L 449.0 390.0 L 460.0 410.0 L 469.0 443.0 L 470.0 464.0 L 458.0 479.0 L 458.0 482.0 L 460.0 485.0 L 459.0 486.0 L 485.0 486.0 L 488.0 483.0 L 487.0 466.0 L 485.0 460.0 L 485.0 434.0 L 483.0 431.0 L 483.0 425.0 L 478.0 407.0 L 478.0 402.0 L 473.0 390.0 L 471.0 380.0 L 469.0 378.0 L 464.0 363.0 L 459.0 354.0 L 456.0 352.0 L 455.0 353.0 L 449.0 352.0 L 444.0 344.0 L 444.0 340.0 L 438.0 325.0 L 438.0 321.0 L 436.0 318.0 L 436.0 315.0 L 431.0 303.0 L 431.0 300.0 L 429.0 297.0 L 429.0 294.0 L 427.0 291.0 L 424.0 279.0 L 422.0 277.0 L 417.0 266.0 L 396.0 248.0 L 373.0 231.0 L 361.0 218.0 L 349.0 202.0 L 348.0 199.0 L 345.0 197.0 L 346.0 196.0 L 344.0 195.0 L 344.0 192.0 L 331.0 175.0 L 327.0 167.0 L 314.0 149.0 L 314.0 147.0 L 310.0 143.0 L 308.0 138.0 L 302.0 130.0 L 293.0 110.0 L 275.0 92.0 L 263.0 78.0 L 247.0 64.0 L 243.0 63.0 Z
+M 141.0 296.0 L 142.0 295.0 L 149.0 300.0 L 161.0 313.0 L 164.0 319.0 L 165.0 329.0 L 163.0 334.0 L 152.0 342.0 L 139.0 345.0 L 132.0 345.0 L 127.0 340.0 L 127.0 337.0 L 124.0 332.0 L 123.0 323.0 L 125.0 319.0 L 130.0 316.0 L 142.0 314.0 L 143.0 310.0 L 142.0 309.0 L 142.0 302.0 L 140.0 297.0 Z" fill-rule="evenodd"/>
+<path fill="#101010" d="M 97.0 318.0 L 97.0 325.0 L 98.0 326.0 L 98.0 328.0 L 98.0 318.0 Z
+M 146.0 303.0 L 145.0 305.0 L 146.0 306.0 L 146.0 312.0 L 147.0 314.0 L 143.0 317.0 L 138.0 317.0 L 135.0 319.0 L 131.0 319.0 L 127.0 322.0 L 128.0 333.0 L 130.0 336.0 L 131.0 340.0 L 134.0 342.0 L 139.0 342.0 L 140.0 341.0 L 144.0 341.0 L 147.0 339.0 L 151.0 339.0 L 158.0 335.0 L 162.0 328.0 L 162.0 325.0 L 161.0 324.0 L 159.0 316.0 L 157.0 314.0 L 157.0 312.0 L 147.0 303.0 Z
+M 98.0 290.0 L 97.0 291.0 L 97.0 303.0 L 98.0 302.0 L 98.0 291.0 Z
+M 104.0 243.0 L 101.0 246.0 L 101.0 249.0 L 100.0 250.0 L 101.0 251.0 L 101.0 253.0 L 104.0 252.0 L 108.0 247.0 L 108.0 245.0 L 105.0 243.0 Z
+M 332.0 230.0 L 332.0 235.0 L 334.0 240.0 L 335.0 238.0 L 335.0 233.0 L 333.0 230.0 Z
+M 136.0 169.0 L 134.0 173.0 L 135.0 177.0 L 142.0 177.0 L 145.0 172.0 L 140.0 169.0 L 137.0 169.0 Z
+M 189.0 101.0 L 185.0 103.0 L 187.0 105.0 L 191.0 105.0 L 191.0 101.0 L 190.0 101.0 Z
+M 245.0 52.0 L 224.0 63.0 L 219.0 67.0 L 214.0 69.0 L 202.0 77.0 L 194.0 80.0 L 188.0 80.0 L 186.0 82.0 L 178.0 94.0 L 172.0 101.0 L 171.0 104.0 L 164.0 112.0 L 161.0 118.0 L 157.0 122.0 L 155.0 126.0 L 147.0 136.0 L 145.0 140.0 L 140.0 144.0 L 138.0 143.0 L 136.0 140.0 L 135.0 140.0 L 133.0 144.0 L 133.0 146.0 L 129.0 153.0 L 129.0 155.0 L 124.0 164.0 L 124.0 166.0 L 120.0 173.0 L 120.0 175.0 L 115.0 184.0 L 115.0 186.0 L 109.0 197.0 L 109.0 199.0 L 104.0 208.0 L 104.0 210.0 L 101.0 216.0 L 98.0 218.0 L 96.0 215.0 L 93.0 214.0 L 93.0 222.0 L 92.0 223.0 L 92.0 230.0 L 91.0 231.0 L 91.0 237.0 L 90.0 238.0 L 90.0 244.0 L 89.0 245.0 L 88.0 260.0 L 87.0 261.0 L 87.0 266.0 L 86.0 267.0 L 86.0 271.0 L 85.0 272.0 L 85.0 277.0 L 84.0 278.0 L 82.0 295.0 L 81.0 296.0 L 79.0 307.0 L 77.0 311.0 L 77.0 314.0 L 74.0 319.0 L 67.0 319.0 L 67.0 324.0 L 74.0 327.0 L 75.0 328.0 L 75.0 330.0 L 72.0 332.0 L 67.0 332.0 L 67.0 343.0 L 76.0 348.0 L 79.0 351.0 L 97.0 375.0 L 104.0 386.0 L 108.0 390.0 L 115.0 401.0 L 119.0 405.0 L 119.0 407.0 L 100.0 428.0 L 100.0 429.0 L 84.0 445.0 L 84.0 446.0 L 69.0 461.0 L 69.0 462.0 L 54.0 478.0 L 54.0 487.0 L 56.0 492.0 L 127.0 492.0 L 130.0 489.0 L 130.0 487.0 L 129.0 486.0 L 128.0 481.0 L 124.0 475.0 L 124.0 473.0 L 123.0 472.0 L 123.0 467.0 L 129.0 458.0 L 131.0 458.0 L 135.0 462.0 L 137.0 462.0 L 140.0 458.0 L 144.0 458.0 L 149.0 453.0 L 152.0 447.0 L 156.0 444.0 L 171.0 443.0 L 172.0 442.0 L 190.0 442.0 L 197.0 436.0 L 200.0 436.0 L 218.0 445.0 L 223.0 445.0 L 227.0 443.0 L 229.0 444.0 L 230.0 441.0 L 233.0 439.0 L 243.0 444.0 L 247.0 449.0 L 247.0 450.0 L 242.0 455.0 L 238.0 457.0 L 236.0 457.0 L 234.0 459.0 L 232.0 459.0 L 224.0 464.0 L 217.0 474.0 L 209.0 490.0 L 209.0 492.0 L 332.0 492.0 L 335.0 489.0 L 336.0 486.0 L 326.0 466.0 L 326.0 464.0 L 325.0 463.0 L 325.0 458.0 L 326.0 456.0 L 334.0 448.0 L 334.0 447.0 L 337.0 445.0 L 339.0 447.0 L 340.0 451.0 L 345.0 446.0 L 347.0 447.0 L 352.0 447.0 L 354.0 446.0 L 372.0 429.0 L 373.0 429.0 L 389.0 413.0 L 389.0 412.0 L 394.0 407.0 L 396.0 403.0 L 399.0 400.0 L 405.0 387.0 L 411.0 387.0 L 412.0 388.0 L 423.0 388.0 L 424.0 389.0 L 434.0 389.0 L 445.0 401.0 L 453.0 417.0 L 453.0 419.0 L 456.0 426.0 L 456.0 429.0 L 458.0 433.0 L 459.0 441.0 L 460.0 442.0 L 460.0 447.0 L 461.0 448.0 L 461.0 453.0 L 462.0 454.0 L 462.0 460.0 L 450.0 473.0 L 450.0 475.0 L 448.0 479.0 L 448.0 482.0 L 447.0 483.0 L 446.0 492.0 L 498.0 492.0 L 499.0 481.0 L 500.0 480.0 L 500.0 473.0 L 501.0 472.0 L 501.0 467.0 L 502.0 466.0 L 502.0 464.0 L 498.0 454.0 L 497.0 442.0 L 496.0 441.0 L 494.0 427.0 L 493.0 426.0 L 492.0 420.0 L 488.0 410.0 L 488.0 407.0 L 486.0 404.0 L 486.0 402.0 L 483.0 395.0 L 483.0 392.0 L 481.0 389.0 L 480.0 384.0 L 478.0 381.0 L 477.0 376.0 L 475.0 373.0 L 474.0 368.0 L 472.0 365.0 L 472.0 363.0 L 470.0 360.0 L 470.0 358.0 L 468.0 355.0 L 467.0 350.0 L 464.0 345.0 L 463.0 341.0 L 457.0 341.0 L 453.0 343.0 L 449.0 338.0 L 449.0 336.0 L 447.0 332.0 L 447.0 329.0 L 446.0 328.0 L 436.0 296.0 L 434.0 293.0 L 434.0 291.0 L 430.0 281.0 L 429.0 274.0 L 428.0 273.0 L 430.0 271.0 L 432.0 273.0 L 434.0 273.0 L 441.0 277.0 L 441.0 274.0 L 439.0 269.0 L 433.0 266.0 L 431.0 266.0 L 427.0 263.0 L 424.0 262.0 L 406.0 249.0 L 392.0 236.0 L 391.0 236.0 L 377.0 223.0 L 376.0 223.0 L 364.0 211.0 L 345.0 184.0 L 344.0 181.0 L 338.0 173.0 L 332.0 162.0 L 323.0 150.0 L 322.0 147.0 L 307.0 125.0 L 305.0 121.0 L 305.0 116.0 L 302.0 111.0 L 254.0 64.0 L 247.0 54.0 L 247.0 52.0 L 246.0 52.0 Z
+M 265.0 440.0 L 266.0 439.0 L 277.0 439.0 L 278.0 440.0 L 278.0 446.0 L 270.0 459.0 L 267.0 461.0 L 264.0 467.0 L 257.0 474.0 L 255.0 478.0 L 253.0 479.0 L 251.0 482.0 L 243.0 489.0 L 235.0 489.0 L 234.0 490.0 L 230.0 490.0 L 228.0 489.0 L 227.0 490.0 L 225.0 490.0 L 223.0 488.0 L 221.0 488.0 L 220.0 487.0 L 220.0 483.0 L 223.0 477.0 L 223.0 475.0 L 228.0 469.0 L 230.0 469.0 L 231.0 467.0 L 236.0 465.0 L 238.0 463.0 L 240.0 463.0 L 243.0 461.0 L 246.0 457.0 L 255.0 452.0 L 262.0 445.0 L 264.0 441.0 Z
+M 122.0 417.0 L 123.0 416.0 L 129.0 416.0 L 132.0 419.0 L 140.0 423.0 L 149.0 431.0 L 150.0 437.0 L 149.0 438.0 L 149.0 440.0 L 144.0 444.0 L 140.0 444.0 L 139.0 443.0 L 134.0 443.0 L 132.0 444.0 L 117.0 460.0 L 118.0 484.0 L 117.0 485.0 L 112.0 485.0 L 107.0 487.0 L 99.0 487.0 L 98.0 486.0 L 69.0 486.0 L 68.0 485.0 L 66.0 485.0 L 65.0 484.0 L 65.0 481.0 L 71.0 473.0 L 72.0 470.0 L 77.0 466.0 L 79.0 462.0 L 83.0 459.0 L 85.0 455.0 L 98.0 442.0 L 100.0 438.0 L 102.0 437.0 L 102.0 436.0 L 121.0 418.0 Z
+M 240.0 61.0 L 241.0 60.0 L 246.0 60.0 L 254.0 66.0 L 256.0 69.0 L 258.0 69.0 L 265.0 77.0 L 265.0 78.0 L 267.0 80.0 L 268.0 79.0 L 272.0 85.0 L 273.0 85.0 L 285.0 98.0 L 285.0 99.0 L 292.0 105.0 L 292.0 106.0 L 297.0 111.0 L 299.0 115.0 L 299.0 117.0 L 303.0 123.0 L 305.0 130.0 L 311.0 137.0 L 312.0 140.0 L 315.0 143.0 L 315.0 145.0 L 317.0 147.0 L 319.0 152.0 L 321.0 153.0 L 322.0 156.0 L 332.0 169.0 L 332.0 172.0 L 333.0 172.0 L 338.0 178.0 L 341.0 184.0 L 345.0 189.0 L 346.0 192.0 L 352.0 199.0 L 353.0 202.0 L 356.0 205.0 L 357.0 208.0 L 362.0 215.0 L 369.0 222.0 L 369.0 223.0 L 381.0 234.0 L 384.0 235.0 L 393.0 243.0 L 393.0 244.0 L 395.0 244.0 L 403.0 251.0 L 408.0 254.0 L 413.0 259.0 L 414.0 259.0 L 419.0 265.0 L 420.0 268.0 L 422.0 269.0 L 427.0 280.0 L 427.0 282.0 L 429.0 285.0 L 430.0 291.0 L 432.0 293.0 L 432.0 296.0 L 435.0 302.0 L 436.0 308.0 L 439.0 314.0 L 440.0 322.0 L 441.0 323.0 L 443.0 331.0 L 445.0 333.0 L 445.0 337.0 L 446.0 338.0 L 447.0 343.0 L 450.0 348.0 L 452.0 348.0 L 453.0 349.0 L 458.0 349.0 L 465.0 358.0 L 467.0 365.0 L 470.0 369.0 L 473.0 380.0 L 475.0 383.0 L 475.0 385.0 L 477.0 389.0 L 477.0 393.0 L 480.0 399.0 L 480.0 403.0 L 482.0 407.0 L 484.0 418.0 L 486.0 422.0 L 487.0 438.0 L 489.0 441.0 L 489.0 467.0 L 490.0 468.0 L 490.0 487.0 L 489.0 488.0 L 464.0 489.0 L 463.0 488.0 L 457.0 488.0 L 455.0 486.0 L 455.0 477.0 L 457.0 476.0 L 460.0 471.0 L 464.0 467.0 L 465.0 467.0 L 465.0 465.0 L 467.0 462.0 L 467.0 451.0 L 466.0 450.0 L 466.0 445.0 L 465.0 444.0 L 465.0 440.0 L 464.0 439.0 L 464.0 434.0 L 462.0 432.0 L 462.0 427.0 L 458.0 417.0 L 458.0 414.0 L 455.0 410.0 L 453.0 403.0 L 449.0 398.0 L 447.0 393.0 L 444.0 389.0 L 435.0 383.0 L 433.0 383.0 L 432.0 382.0 L 427.0 382.0 L 426.0 381.0 L 422.0 381.0 L 421.0 380.0 L 420.0 381.0 L 400.0 380.0 L 391.0 374.0 L 388.0 367.0 L 385.0 363.0 L 384.0 358.0 L 381.0 355.0 L 381.0 353.0 L 375.0 341.0 L 373.0 334.0 L 367.0 323.0 L 367.0 321.0 L 366.0 320.0 L 366.0 301.0 L 364.0 299.0 L 364.0 296.0 L 355.0 284.0 L 356.0 291.0 L 358.0 292.0 L 358.0 297.0 L 359.0 298.0 L 359.0 302.0 L 357.0 306.0 L 357.0 311.0 L 359.0 315.0 L 359.0 320.0 L 365.0 331.0 L 365.0 333.0 L 369.0 340.0 L 369.0 342.0 L 372.0 346.0 L 374.0 353.0 L 379.0 360.0 L 379.0 362.0 L 381.0 364.0 L 382.0 369.0 L 386.0 375.0 L 386.0 377.0 L 388.0 380.0 L 389.0 386.0 L 391.0 390.0 L 391.0 394.0 L 389.0 399.0 L 382.0 407.0 L 382.0 408.0 L 373.0 416.0 L 368.0 419.0 L 359.0 429.0 L 357.0 429.0 L 355.0 432.0 L 351.0 434.0 L 349.0 434.0 L 346.0 430.0 L 343.0 430.0 L 342.0 429.0 L 340.0 430.0 L 335.0 435.0 L 335.0 436.0 L 329.0 440.0 L 318.0 452.0 L 318.0 454.0 L 317.0 455.0 L 317.0 463.0 L 318.0 464.0 L 318.0 467.0 L 321.0 473.0 L 322.0 480.0 L 323.0 481.0 L 323.0 483.0 L 319.0 486.0 L 286.0 486.0 L 285.0 485.0 L 269.0 485.0 L 268.0 484.0 L 263.0 484.0 L 262.0 483.0 L 262.0 481.0 L 269.0 469.0 L 273.0 466.0 L 274.0 463.0 L 279.0 458.0 L 279.0 457.0 L 283.0 454.0 L 288.0 445.0 L 291.0 443.0 L 299.0 431.0 L 307.0 422.0 L 311.0 415.0 L 315.0 412.0 L 315.0 410.0 L 317.0 408.0 L 320.0 402.0 L 320.0 400.0 L 318.0 398.0 L 304.0 397.0 L 303.0 396.0 L 298.0 396.0 L 297.0 397.0 L 295.0 397.0 L 294.0 396.0 L 292.0 397.0 L 300.0 401.0 L 306.0 407.0 L 306.0 409.0 L 301.0 419.0 L 293.0 427.0 L 288.0 430.0 L 283.0 430.0 L 282.0 431.0 L 258.0 431.0 L 258.0 432.0 L 256.0 433.0 L 253.0 437.0 L 245.0 436.0 L 243.0 434.0 L 238.0 433.0 L 236.0 431.0 L 230.0 428.0 L 224.0 428.0 L 223.0 427.0 L 218.0 432.0 L 211.0 431.0 L 207.0 428.0 L 202.0 426.0 L 200.0 424.0 L 200.0 417.0 L 201.0 416.0 L 201.0 413.0 L 205.0 402.0 L 205.0 381.0 L 206.0 380.0 L 206.0 372.0 L 205.0 371.0 L 205.0 357.0 L 204.0 356.0 L 204.0 353.0 L 202.0 352.0 L 201.0 353.0 L 199.0 353.0 L 198.0 358.0 L 197.0 359.0 L 197.0 365.0 L 201.0 368.0 L 201.0 372.0 L 202.0 373.0 L 202.0 382.0 L 203.0 383.0 L 203.0 393.0 L 201.0 397.0 L 201.0 404.0 L 197.0 412.0 L 188.0 421.0 L 188.0 422.0 L 184.0 426.0 L 184.0 428.0 L 181.0 432.0 L 179.0 433.0 L 161.0 433.0 L 156.0 429.0 L 150.0 421.0 L 147.0 420.0 L 139.0 414.0 L 137.0 414.0 L 129.0 406.0 L 123.0 397.0 L 121.0 396.0 L 116.0 390.0 L 116.0 388.0 L 110.0 382.0 L 110.0 381.0 L 106.0 378.0 L 91.0 357.0 L 89.0 356.0 L 89.0 354.0 L 86.0 351.0 L 81.0 339.0 L 80.0 331.0 L 81.0 330.0 L 81.0 317.0 L 83.0 315.0 L 83.0 310.0 L 84.0 309.0 L 84.0 305.0 L 85.0 304.0 L 85.0 297.0 L 86.0 296.0 L 86.0 292.0 L 87.0 291.0 L 87.0 282.0 L 86.0 281.0 L 88.0 279.0 L 89.0 262.0 L 90.0 261.0 L 90.0 253.0 L 91.0 252.0 L 91.0 248.0 L 92.0 247.0 L 92.0 239.0 L 94.0 235.0 L 94.0 232.0 L 97.0 226.0 L 102.0 220.0 L 107.0 209.0 L 109.0 207.0 L 109.0 205.0 L 112.0 199.0 L 114.0 197.0 L 113.0 195.0 L 117.0 189.0 L 117.0 186.0 L 119.0 183.0 L 119.0 181.0 L 122.0 177.0 L 123.0 173.0 L 126.0 169.0 L 127.0 165.0 L 129.0 164.0 L 130.0 159.0 L 135.0 153.0 L 138.0 152.0 L 143.0 148.0 L 143.0 146.0 L 147.0 143.0 L 153.0 134.0 L 157.0 130.0 L 159.0 126.0 L 163.0 122.0 L 164.0 118.0 L 167.0 116.0 L 169.0 112.0 L 178.0 101.0 L 180.0 97.0 L 182.0 96.0 L 187.0 90.0 L 195.0 84.0 L 198.0 83.0 L 201.0 80.0 L 203.0 80.0 L 205.0 78.0 L 210.0 76.0 L 214.0 73.0 L 218.0 72.0 L 220.0 70.0 L 223.0 70.0 L 225.0 68.0 L 230.0 68.0 L 239.0 61.0 Z" fill-rule="evenodd"/>
+</g>
+      </svg>
+      <div class="logo">ЗУБР<span>МОНТАЖ</span>СТРОЙ</div>
+      <img
+        class="city-coat"
+        src="https://commons.wikimedia.org/wiki/Special:FilePath/Coat_of_Arms_of_Asipovi%C4%8Dy%2C_Belarus.png"
+        alt="Герб города Осиповичи, Республика Беларусь"
+        loading="eager"
+        decoding="async">
+    </div>
+    <button class="mobile-menu-toggle" type="button" aria-label="Открыть меню" aria-expanded="false"><span></span><span></span><span></span></button>
+
+<nav>
+      <a href="#services" data-lang-key="nav.services">Услуги</a>
+      <a href="#advantages" data-lang-key="nav.about">О нас</a>
+      <a href="#projects" data-lang-key="nav.projects">Проекты</a>
+      <a href="#equipment" data-lang-key="nav.equipment">Техника</a>
+      <a href="#footer" data-lang-key="nav.contacts">Контакты</a>
+    </nav>
+    <div class="lang-toggle">
+      <button class="active" data-lang="ru">RU</button>
+      <button data-lang="en">EN</button>
+    </div>
+  </header>
+
+  <!-- ПРОМО-БЛОК -->
+  <section class="promo container" id="promo">
+    <div class="promo-content">
+      <h1 id="promo-title">
+        Строим <span class="accent">объекты</span><br />под ключ
+      </h1>
+      <p id="promo-sub">Возводим жилые комплексы, промышленные здания. Гарантия качества и соблюдение сроков.</p>
+      <a href="#" class="btn" id="mainCta">Оставить заявку</a>
+    </div>
+    <div class="hatch" id="hatch1">
+      <svg class="zubr exact-zubr" viewBox="0 0 535 506" xmlns="http://www.w3.org/2000/svg" aria-label="Зубр">
+<g class="zubr-shadow">
+<path fill="#bdbdbd" d="M 203.0 460.0 L 202.0 462.0 L 206.0 462.0 L 204.0 461.0 Z
+M 57.0 342.0 L 61.0 357.0 L 71.0 362.0 L 75.0 366.0 L 73.0 369.0 L 75.0 367.0 L 81.0 373.0 L 80.0 375.0 L 85.0 379.0 L 101.0 400.0 L 102.0 407.0 L 97.0 414.0 L 90.0 421.0 L 89.0 420.0 L 90.0 421.0 L 86.0 425.0 L 84.0 425.0 L 85.0 426.0 L 70.0 441.0 L 69.0 444.0 L 66.0 445.0 L 64.0 449.0 L 56.0 457.0 L 54.0 457.0 L 52.0 461.0 L 51.0 460.0 L 50.0 463.0 L 45.0 468.0 L 44.0 472.0 L 44.0 487.0 L 45.0 488.0 L 57.0 473.0 L 82.0 447.0 L 83.0 444.0 L 96.0 432.0 L 118.0 407.0 L 118.0 405.0 L 114.0 401.0 L 78.0 351.0 L 66.0 344.0 L 58.0 343.0 Z
+M 57.0 324.0 L 57.0 329.0 L 64.0 331.0 L 74.0 330.0 L 74.0 328.0 L 67.0 325.0 L 58.0 325.0 Z
+M 69.0 330.0 L 70.0 329.0 L 73.0 330.0 L 70.0 331.0 Z
+M 64.0 330.0 L 65.0 329.0 L 68.0 330.0 L 65.0 331.0 Z
+M 430.0 272.0 L 429.0 273.0 L 433.0 280.0 L 433.0 284.0 L 437.0 293.0 L 438.0 301.0 L 442.0 307.0 L 442.0 312.0 L 445.0 316.0 L 447.0 328.0 L 452.0 336.0 L 452.0 341.0 L 453.0 342.0 L 457.0 340.0 L 463.0 340.0 L 473.0 365.0 L 477.0 372.0 L 477.0 375.0 L 480.0 380.0 L 480.0 383.0 L 491.0 413.0 L 498.0 441.0 L 499.0 454.0 L 503.0 464.0 L 500.0 488.0 L 498.0 493.0 L 489.0 493.0 L 488.0 494.0 L 457.0 494.0 L 455.0 493.0 L 454.0 494.0 L 448.0 494.0 L 445.0 492.0 L 446.0 482.0 L 449.0 473.0 L 461.0 460.0 L 459.0 442.0 L 452.0 417.0 L 445.0 403.0 L 442.0 401.0 L 440.0 396.0 L 434.0 390.0 L 423.0 390.0 L 422.0 389.0 L 407.0 388.0 L 404.0 390.0 L 400.0 400.0 L 390.0 413.0 L 371.0 432.0 L 341.0 458.0 L 339.0 457.0 L 338.0 447.0 L 335.0 448.0 L 327.0 456.0 L 326.0 463.0 L 336.0 483.0 L 339.0 491.0 L 338.0 493.0 L 241.0 493.0 L 240.0 494.0 L 209.0 493.0 L 208.0 490.0 L 212.0 483.0 L 212.0 481.0 L 222.0 465.0 L 228.0 460.0 L 243.0 453.0 L 246.0 449.0 L 243.0 445.0 L 233.0 440.0 L 226.0 449.0 L 224.0 449.0 L 202.0 438.0 L 197.0 437.0 L 190.0 443.0 L 174.0 443.0 L 173.0 444.0 L 157.0 445.0 L 155.0 447.0 L 153.0 447.0 L 150.0 453.0 L 143.0 460.0 L 138.0 463.0 L 135.0 463.0 L 131.0 459.0 L 129.0 459.0 L 124.0 467.0 L 124.0 472.0 L 131.0 487.0 L 131.0 493.0 L 130.0 494.0 L 113.0 494.0 L 112.0 493.0 L 110.0 494.0 L 103.0 494.0 L 102.0 493.0 L 99.0 494.0 L 98.0 493.0 L 63.0 493.0 L 62.0 494.0 L 55.0 494.0 L 54.0 493.0 L 46.0 493.0 L 46.0 495.0 L 51.0 501.0 L 70.0 501.0 L 71.0 502.0 L 70.0 503.0 L 79.0 503.0 L 87.0 501.0 L 133.0 501.0 L 140.0 492.0 L 141.0 489.0 L 140.0 480.0 L 142.0 478.0 L 142.0 471.0 L 145.0 468.0 L 149.0 468.0 L 154.0 466.0 L 155.0 464.0 L 158.0 463.0 L 157.0 462.0 L 165.0 457.0 L 169.0 456.0 L 187.0 456.0 L 197.0 451.0 L 200.0 453.0 L 204.0 453.0 L 211.0 457.0 L 210.0 462.0 L 207.0 467.0 L 205.0 468.0 L 206.0 469.0 L 197.0 483.0 L 198.0 495.0 L 201.0 501.0 L 206.0 500.0 L 218.0 500.0 L 219.0 501.0 L 318.0 500.0 L 319.0 502.0 L 322.0 502.0 L 323.0 500.0 L 328.0 500.0 L 330.0 502.0 L 331.0 500.0 L 339.0 500.0 L 345.0 492.0 L 347.0 484.0 L 347.0 480.0 L 345.0 477.0 L 345.0 474.0 L 343.0 472.0 L 346.0 469.0 L 344.0 461.0 L 348.0 457.0 L 357.0 457.0 L 361.0 456.0 L 363.0 454.0 L 364.0 455.0 L 372.0 446.0 L 377.0 446.0 L 384.0 439.0 L 385.0 436.0 L 384.0 434.0 L 388.0 431.0 L 387.0 430.0 L 390.0 429.0 L 416.0 403.0 L 428.0 403.0 L 433.0 407.0 L 432.0 408.0 L 437.0 410.0 L 437.0 412.0 L 441.0 417.0 L 446.0 432.0 L 446.0 437.0 L 449.0 446.0 L 449.0 453.0 L 447.0 455.0 L 446.0 459.0 L 441.0 465.0 L 441.0 468.0 L 438.0 474.0 L 438.0 478.0 L 436.0 482.0 L 436.0 486.0 L 433.0 487.0 L 434.0 489.0 L 432.0 492.0 L 434.0 499.0 L 435.0 500.0 L 510.0 500.0 L 512.0 497.0 L 512.0 492.0 L 510.0 487.0 L 511.0 486.0 L 515.0 487.0 L 515.0 473.0 L 514.0 472.0 L 514.0 461.0 L 512.0 455.0 L 512.0 443.0 L 507.0 431.0 L 508.0 429.0 L 506.0 426.0 L 504.0 417.0 L 502.0 415.0 L 501.0 409.0 L 498.0 404.0 L 499.0 402.0 L 497.0 401.0 L 497.0 397.0 L 494.0 392.0 L 492.0 382.0 L 489.0 378.0 L 489.0 374.0 L 487.0 373.0 L 488.0 371.0 L 486.0 370.0 L 486.0 366.0 L 483.0 362.0 L 481.0 353.0 L 479.0 350.0 L 479.0 345.0 L 476.0 343.0 L 475.0 337.0 L 472.0 332.0 L 472.0 329.0 L 467.0 324.0 L 459.0 324.0 L 457.0 322.0 L 458.0 319.0 L 457.0 320.0 L 455.0 318.0 L 455.0 313.0 L 453.0 311.0 L 451.0 305.0 L 452.0 303.0 L 454.0 303.0 L 452.0 303.0 L 449.0 298.0 L 450.0 295.0 L 453.0 297.0 L 452.0 298.0 L 453.0 299.0 L 455.0 296.0 L 459.0 297.0 L 454.0 282.0 L 445.0 280.0 L 431.0 273.0 Z
+M 381.0 437.0 L 382.0 436.0 L 383.0 437.0 L 382.0 439.0 L 381.0 438.0 Z
+M 382.0 436.0 L 383.0 435.0 L 385.0 436.0 L 383.0 437.0 Z
+M 438.0 249.0 L 438.0 251.0 L 441.0 252.0 L 439.0 249.0 Z
+M 248.0 37.0 L 243.0 39.0 L 241.0 38.0 L 240.0 40.0 L 238.0 38.0 L 232.0 38.0 L 235.0 41.0 L 232.0 44.0 L 231.0 43.0 L 225.0 48.0 L 219.0 49.0 L 217.0 52.0 L 212.0 55.0 L 209.0 54.0 L 205.0 59.0 L 202.0 58.0 L 199.0 61.0 L 197.0 61.0 L 195.0 58.0 L 189.0 59.0 L 182.0 66.0 L 180.0 70.0 L 176.0 73.0 L 175.0 77.0 L 173.0 79.0 L 171.0 79.0 L 168.0 86.0 L 167.0 85.0 L 164.0 92.0 L 155.0 103.0 L 151.0 110.0 L 148.0 112.0 L 148.0 114.0 L 143.0 118.0 L 136.0 118.0 L 132.0 120.0 L 130.0 125.0 L 127.0 128.0 L 128.0 129.0 L 127.0 131.0 L 123.0 132.0 L 125.0 136.0 L 120.0 145.0 L 120.0 147.0 L 118.0 149.0 L 114.0 159.0 L 113.0 158.0 L 114.0 160.0 L 111.0 164.0 L 110.0 163.0 L 111.0 165.0 L 110.0 170.0 L 104.0 179.0 L 105.0 180.0 L 101.0 190.0 L 98.0 193.0 L 96.0 192.0 L 93.0 194.0 L 87.0 195.0 L 85.0 197.0 L 82.0 216.0 L 80.0 220.0 L 81.0 226.0 L 80.0 229.0 L 78.0 230.0 L 79.0 236.0 L 75.0 256.0 L 74.0 270.0 L 72.0 276.0 L 72.0 286.0 L 70.0 292.0 L 70.0 298.0 L 65.0 305.0 L 63.0 304.0 L 59.0 305.0 L 58.0 317.0 L 57.0 318.0 L 74.0 318.0 L 76.0 314.0 L 79.0 303.0 L 79.0 295.0 L 82.0 288.0 L 82.0 282.0 L 85.0 271.0 L 85.0 255.0 L 89.0 241.0 L 89.0 232.0 L 91.0 228.0 L 92.0 214.0 L 94.0 213.0 L 98.0 215.0 L 102.0 212.0 L 104.0 207.0 L 104.0 203.0 L 108.0 199.0 L 111.0 192.0 L 111.0 188.0 L 116.0 181.0 L 117.0 175.0 L 123.0 165.0 L 126.0 158.0 L 126.0 155.0 L 129.0 152.0 L 134.0 140.0 L 136.0 139.0 L 140.0 143.0 L 151.0 130.0 L 153.0 125.0 L 158.0 120.0 L 160.0 115.0 L 163.0 113.0 L 176.0 95.0 L 177.0 92.0 L 188.0 79.0 L 193.0 79.0 L 196.0 77.0 L 199.0 77.0 L 204.0 73.0 L 208.0 72.0 L 244.0 51.0 L 247.0 51.0 L 252.0 60.0 L 260.0 66.0 L 263.0 70.0 L 265.0 70.0 L 268.0 73.0 L 268.0 75.0 L 272.0 79.0 L 275.0 80.0 L 287.0 92.0 L 292.0 100.0 L 304.0 111.0 L 306.0 116.0 L 306.0 121.0 L 312.0 131.0 L 318.0 138.0 L 319.0 142.0 L 321.0 143.0 L 327.0 154.0 L 331.0 157.0 L 331.0 160.0 L 339.0 173.0 L 343.0 176.0 L 346.0 184.0 L 352.0 190.0 L 352.0 192.0 L 356.0 197.0 L 356.0 199.0 L 361.0 206.0 L 365.0 209.0 L 365.0 211.0 L 391.0 235.0 L 410.0 251.0 L 414.0 252.0 L 421.0 259.0 L 440.0 269.0 L 450.0 271.0 L 449.0 266.0 L 442.0 255.0 L 432.0 251.0 L 429.0 248.0 L 427.0 248.0 L 426.0 247.0 L 427.0 246.0 L 426.0 247.0 L 425.0 245.0 L 420.0 243.0 L 413.0 236.0 L 401.0 227.0 L 399.0 224.0 L 395.0 222.0 L 391.0 217.0 L 389.0 217.0 L 377.0 206.0 L 378.0 205.0 L 377.0 206.0 L 373.0 202.0 L 370.0 196.0 L 369.0 190.0 L 366.0 188.0 L 364.0 190.0 L 361.0 187.0 L 359.0 183.0 L 361.0 182.0 L 355.0 177.0 L 351.0 171.0 L 350.0 167.0 L 345.0 162.0 L 345.0 160.0 L 343.0 158.0 L 344.0 157.0 L 342.0 155.0 L 341.0 156.0 L 339.0 151.0 L 336.0 148.0 L 337.0 144.0 L 335.0 145.0 L 334.0 142.0 L 330.0 138.0 L 329.0 132.0 L 324.0 127.0 L 324.0 124.0 L 322.0 120.0 L 322.0 116.0 L 324.0 114.0 L 322.0 116.0 L 321.0 112.0 L 320.0 113.0 L 318.0 109.0 L 290.0 81.0 L 286.0 76.0 L 286.0 74.0 L 284.0 75.0 L 283.0 74.0 L 284.0 73.0 L 277.0 68.0 L 266.0 57.0 L 267.0 56.0 L 263.0 53.0 L 262.0 51.0 L 263.0 48.0 L 260.0 47.0 L 258.0 40.0 L 255.0 37.0 L 249.0 37.0 Z
+M 367.0 193.0 L 368.0 192.0 L 369.0 193.0 L 368.0 195.0 L 367.0 194.0 Z
+M 201.0 59.0 L 202.0 58.0 L 204.0 59.0 L 202.0 60.0 Z" fill-rule="evenodd"/>
+</g>
+<g class="zubr-art">
+<path fill="#f60000" d="M 268.0 442.0 L 266.0 443.0 L 264.0 448.0 L 259.0 453.0 L 256.0 454.0 L 251.0 459.0 L 227.0 474.0 L 224.0 481.0 L 224.0 485.0 L 230.0 487.0 L 231.0 486.0 L 243.0 486.0 L 254.0 473.0 L 257.0 471.0 L 273.0 449.0 L 274.0 444.0 L 269.0 442.0 Z
+M 124.0 419.0 L 111.0 431.0 L 96.0 449.0 L 82.0 463.0 L 71.0 477.0 L 72.0 479.0 L 71.0 482.0 L 72.0 483.0 L 110.0 483.0 L 115.0 479.0 L 113.0 460.0 L 122.0 452.0 L 133.0 439.0 L 137.0 439.0 L 141.0 441.0 L 144.0 441.0 L 146.0 439.0 L 146.0 432.0 L 141.0 427.0 L 135.0 424.0 L 132.0 421.0 L 128.0 419.0 L 125.0 419.0 Z
+M 95.0 246.0 L 94.0 266.0 L 96.0 256.0 L 96.0 249.0 L 95.0 248.0 L 96.0 247.0 Z
+M 128.0 174.0 L 126.0 176.0 L 125.0 182.0 L 122.0 184.0 L 120.0 188.0 L 120.0 190.0 L 110.0 211.0 L 108.0 213.0 L 107.0 217.0 L 98.0 231.0 L 98.0 234.0 L 96.0 238.0 L 96.0 244.0 L 97.0 245.0 L 100.0 241.0 L 106.0 239.0 L 114.0 226.0 L 126.0 189.0 L 127.0 182.0 L 129.0 179.0 L 129.0 175.0 Z
+M 178.0 107.0 L 173.0 111.0 L 171.0 117.0 L 168.0 118.0 L 165.0 124.0 L 158.0 132.0 L 157.0 136.0 L 152.0 140.0 L 148.0 146.0 L 139.0 155.0 L 137.0 155.0 L 134.0 158.0 L 134.0 163.0 L 131.0 165.0 L 131.0 168.0 L 134.0 167.0 L 136.0 164.0 L 146.0 166.0 L 150.0 159.0 L 150.0 157.0 L 173.0 120.0 L 178.0 108.0 Z
+M 242.0 63.0 L 224.0 76.0 L 223.0 75.0 L 224.0 72.0 L 222.0 74.0 L 217.0 75.0 L 210.0 80.0 L 200.0 84.0 L 197.0 87.0 L 194.0 88.0 L 193.0 90.0 L 190.0 91.0 L 191.0 92.0 L 190.0 95.0 L 194.0 99.0 L 201.0 96.0 L 209.0 89.0 L 211.0 90.0 L 199.0 104.0 L 195.0 107.0 L 185.0 111.0 L 178.0 119.0 L 177.0 123.0 L 174.0 126.0 L 162.0 148.0 L 162.0 150.0 L 147.0 176.0 L 142.0 182.0 L 137.0 179.0 L 134.0 183.0 L 130.0 193.0 L 130.0 196.0 L 120.0 219.0 L 110.0 250.0 L 105.0 255.0 L 103.0 259.0 L 102.0 335.0 L 104.0 344.0 L 115.0 358.0 L 121.0 371.0 L 120.0 372.0 L 107.0 358.0 L 100.0 348.0 L 100.0 346.0 L 95.0 338.0 L 94.0 330.0 L 92.0 325.0 L 93.0 276.0 L 94.0 275.0 L 93.0 271.0 L 91.0 272.0 L 90.0 295.0 L 85.0 315.0 L 85.0 322.0 L 84.0 323.0 L 84.0 338.0 L 91.0 353.0 L 98.0 363.0 L 105.0 370.0 L 107.0 374.0 L 114.0 381.0 L 119.0 389.0 L 125.0 395.0 L 130.0 403.0 L 138.0 411.0 L 151.0 418.0 L 157.0 424.0 L 160.0 429.0 L 164.0 430.0 L 177.0 430.0 L 179.0 429.0 L 183.0 422.0 L 195.0 409.0 L 199.0 396.0 L 199.0 373.0 L 198.0 368.0 L 194.0 367.0 L 192.0 365.0 L 196.0 351.0 L 199.0 348.0 L 202.0 347.0 L 206.0 348.0 L 208.0 352.0 L 209.0 396.0 L 208.0 397.0 L 207.0 407.0 L 203.0 419.0 L 203.0 422.0 L 208.0 426.0 L 213.0 428.0 L 218.0 428.0 L 219.0 425.0 L 221.0 423.0 L 233.0 426.0 L 251.0 435.0 L 258.0 428.0 L 284.0 428.0 L 291.0 425.0 L 298.0 418.0 L 301.0 412.0 L 301.0 406.0 L 299.0 404.0 L 283.0 397.0 L 280.0 394.0 L 281.0 392.0 L 287.0 391.0 L 288.0 392.0 L 313.0 394.0 L 323.0 396.0 L 324.0 400.0 L 318.0 410.0 L 318.0 412.0 L 314.0 416.0 L 311.0 422.0 L 305.0 428.0 L 305.0 430.0 L 267.0 477.0 L 268.0 481.0 L 270.0 482.0 L 288.0 482.0 L 289.0 483.0 L 313.0 483.0 L 317.0 482.0 L 320.0 479.0 L 313.0 463.0 L 313.0 457.0 L 316.0 450.0 L 329.0 436.0 L 343.0 424.0 L 345.0 424.0 L 348.0 428.0 L 352.0 430.0 L 354.0 429.0 L 366.0 417.0 L 373.0 412.0 L 383.0 402.0 L 388.0 395.0 L 387.0 386.0 L 385.0 385.0 L 385.0 381.0 L 362.0 334.0 L 362.0 332.0 L 357.0 323.0 L 357.0 320.0 L 355.0 318.0 L 354.0 314.0 L 354.0 304.0 L 355.0 303.0 L 354.0 292.0 L 346.0 273.0 L 344.0 271.0 L 344.0 269.0 L 330.0 242.0 L 328.0 235.0 L 328.0 222.0 L 325.0 214.0 L 326.0 211.0 L 332.0 218.0 L 334.0 224.0 L 337.0 228.0 L 339.0 234.0 L 340.0 244.0 L 345.0 258.0 L 369.0 300.0 L 370.0 303.0 L 369.0 320.0 L 372.0 324.0 L 380.0 344.0 L 393.0 371.0 L 397.0 375.0 L 403.0 378.0 L 406.0 377.0 L 407.0 378.0 L 430.0 378.0 L 440.0 382.0 L 449.0 390.0 L 460.0 410.0 L 469.0 443.0 L 470.0 464.0 L 458.0 479.0 L 458.0 482.0 L 460.0 485.0 L 459.0 486.0 L 485.0 486.0 L 488.0 483.0 L 487.0 466.0 L 485.0 460.0 L 485.0 434.0 L 483.0 431.0 L 483.0 425.0 L 478.0 407.0 L 478.0 402.0 L 473.0 390.0 L 471.0 380.0 L 469.0 378.0 L 464.0 363.0 L 459.0 354.0 L 456.0 352.0 L 455.0 353.0 L 449.0 352.0 L 444.0 344.0 L 444.0 340.0 L 438.0 325.0 L 438.0 321.0 L 436.0 318.0 L 436.0 315.0 L 431.0 303.0 L 431.0 300.0 L 429.0 297.0 L 429.0 294.0 L 427.0 291.0 L 424.0 279.0 L 422.0 277.0 L 417.0 266.0 L 396.0 248.0 L 373.0 231.0 L 361.0 218.0 L 349.0 202.0 L 348.0 199.0 L 345.0 197.0 L 346.0 196.0 L 344.0 195.0 L 344.0 192.0 L 331.0 175.0 L 327.0 167.0 L 314.0 149.0 L 314.0 147.0 L 310.0 143.0 L 308.0 138.0 L 302.0 130.0 L 293.0 110.0 L 275.0 92.0 L 263.0 78.0 L 247.0 64.0 L 243.0 63.0 Z
+M 141.0 296.0 L 142.0 295.0 L 149.0 300.0 L 161.0 313.0 L 164.0 319.0 L 165.0 329.0 L 163.0 334.0 L 152.0 342.0 L 139.0 345.0 L 132.0 345.0 L 127.0 340.0 L 127.0 337.0 L 124.0 332.0 L 123.0 323.0 L 125.0 319.0 L 130.0 316.0 L 142.0 314.0 L 143.0 310.0 L 142.0 309.0 L 142.0 302.0 L 140.0 297.0 Z" fill-rule="evenodd"/>
+<path fill="#101010" d="M 97.0 318.0 L 97.0 325.0 L 98.0 326.0 L 98.0 328.0 L 98.0 318.0 Z
+M 146.0 303.0 L 145.0 305.0 L 146.0 306.0 L 146.0 312.0 L 147.0 314.0 L 143.0 317.0 L 138.0 317.0 L 135.0 319.0 L 131.0 319.0 L 127.0 322.0 L 128.0 333.0 L 130.0 336.0 L 131.0 340.0 L 134.0 342.0 L 139.0 342.0 L 140.0 341.0 L 144.0 341.0 L 147.0 339.0 L 151.0 339.0 L 158.0 335.0 L 162.0 328.0 L 162.0 325.0 L 161.0 324.0 L 159.0 316.0 L 157.0 314.0 L 157.0 312.0 L 147.0 303.0 Z
+M 98.0 290.0 L 97.0 291.0 L 97.0 303.0 L 98.0 302.0 L 98.0 291.0 Z
+M 104.0 243.0 L 101.0 246.0 L 101.0 249.0 L 100.0 250.0 L 101.0 251.0 L 101.0 253.0 L 104.0 252.0 L 108.0 247.0 L 108.0 245.0 L 105.0 243.0 Z
+M 332.0 230.0 L 332.0 235.0 L 334.0 240.0 L 335.0 238.0 L 335.0 233.0 L 333.0 230.0 Z
+M 136.0 169.0 L 134.0 173.0 L 135.0 177.0 L 142.0 177.0 L 145.0 172.0 L 140.0 169.0 L 137.0 169.0 Z
+M 189.0 101.0 L 185.0 103.0 L 187.0 105.0 L 191.0 105.0 L 191.0 101.0 L 190.0 101.0 Z
+M 245.0 52.0 L 224.0 63.0 L 219.0 67.0 L 214.0 69.0 L 202.0 77.0 L 194.0 80.0 L 188.0 80.0 L 186.0 82.0 L 178.0 94.0 L 172.0 101.0 L 171.0 104.0 L 164.0 112.0 L 161.0 118.0 L 157.0 122.0 L 155.0 126.0 L 147.0 136.0 L 145.0 140.0 L 140.0 144.0 L 138.0 143.0 L 136.0 140.0 L 135.0 140.0 L 133.0 144.0 L 133.0 146.0 L 129.0 153.0 L 129.0 155.0 L 124.0 164.0 L 124.0 166.0 L 120.0 173.0 L 120.0 175.0 L 115.0 184.0 L 115.0 186.0 L 109.0 197.0 L 109.0 199.0 L 104.0 208.0 L 104.0 210.0 L 101.0 216.0 L 98.0 218.0 L 96.0 215.0 L 93.0 214.0 L 93.0 222.0 L 92.0 223.0 L 92.0 230.0 L 91.0 231.0 L 91.0 237.0 L 90.0 238.0 L 90.0 244.0 L 89.0 245.0 L 88.0 260.0 L 87.0 261.0 L 87.0 266.0 L 86.0 267.0 L 86.0 271.0 L 85.0 272.0 L 85.0 277.0 L 84.0 278.0 L 82.0 295.0 L 81.0 296.0 L 79.0 307.0 L 77.0 311.0 L 77.0 314.0 L 74.0 319.0 L 67.0 319.0 L 67.0 324.0 L 74.0 327.0 L 75.0 328.0 L 75.0 330.0 L 72.0 332.0 L 67.0 332.0 L 67.0 343.0 L 76.0 348.0 L 79.0 351.0 L 97.0 375.0 L 104.0 386.0 L 108.0 390.0 L 115.0 401.0 L 119.0 405.0 L 119.0 407.0 L 100.0 428.0 L 100.0 429.0 L 84.0 445.0 L 84.0 446.0 L 69.0 461.0 L 69.0 462.0 L 54.0 478.0 L 54.0 487.0 L 56.0 492.0 L 127.0 492.0 L 130.0 489.0 L 130.0 487.0 L 129.0 486.0 L 128.0 481.0 L 124.0 475.0 L 124.0 473.0 L 123.0 472.0 L 123.0 467.0 L 129.0 458.0 L 131.0 458.0 L 135.0 462.0 L 137.0 462.0 L 140.0 458.0 L 144.0 458.0 L 149.0 453.0 L 152.0 447.0 L 156.0 444.0 L 171.0 443.0 L 172.0 442.0 L 190.0 442.0 L 197.0 436.0 L 200.0 436.0 L 218.0 445.0 L 223.0 445.0 L 227.0 443.0 L 229.0 444.0 L 230.0 441.0 L 233.0 439.0 L 243.0 444.0 L 247.0 449.0 L 247.0 450.0 L 242.0 455.0 L 238.0 457.0 L 236.0 457.0 L 234.0 459.0 L 232.0 459.0 L 224.0 464.0 L 217.0 474.0 L 209.0 490.0 L 209.0 492.0 L 332.0 492.0 L 335.0 489.0 L 336.0 486.0 L 326.0 466.0 L 326.0 464.0 L 325.0 463.0 L 325.0 458.0 L 326.0 456.0 L 334.0 448.0 L 334.0 447.0 L 337.0 445.0 L 339.0 447.0 L 340.0 451.0 L 345.0 446.0 L 347.0 447.0 L 352.0 447.0 L 354.0 446.0 L 372.0 429.0 L 373.0 429.0 L 389.0 413.0 L 389.0 412.0 L 394.0 407.0 L 396.0 403.0 L 399.0 400.0 L 405.0 387.0 L 411.0 387.0 L 412.0 388.0 L 423.0 388.0 L 424.0 389.0 L 434.0 389.0 L 445.0 401.0 L 453.0 417.0 L 453.0 419.0 L 456.0 426.0 L 456.0 429.0 L 458.0 433.0 L 459.0 441.0 L 460.0 442.0 L 460.0 447.0 L 461.0 448.0 L 461.0 453.0 L 462.0 454.0 L 462.0 460.0 L 450.0 473.0 L 450.0 475.0 L 448.0 479.0 L 448.0 482.0 L 447.0 483.0 L 446.0 492.0 L 498.0 492.0 L 499.0 481.0 L 500.0 480.0 L 500.0 473.0 L 501.0 472.0 L 501.0 467.0 L 502.0 466.0 L 502.0 464.0 L 498.0 454.0 L 497.0 442.0 L 496.0 441.0 L 494.0 427.0 L 493.0 426.0 L 492.0 420.0 L 488.0 410.0 L 488.0 407.0 L 486.0 404.0 L 486.0 402.0 L 483.0 395.0 L 483.0 392.0 L 481.0 389.0 L 480.0 384.0 L 478.0 381.0 L 477.0 376.0 L 475.0 373.0 L 474.0 368.0 L 472.0 365.0 L 472.0 363.0 L 470.0 360.0 L 470.0 358.0 L 468.0 355.0 L 467.0 350.0 L 464.0 345.0 L 463.0 341.0 L 457.0 341.0 L 453.0 343.0 L 449.0 338.0 L 449.0 336.0 L 447.0 332.0 L 447.0 329.0 L 446.0 328.0 L 436.0 296.0 L 434.0 293.0 L 434.0 291.0 L 430.0 281.0 L 429.0 274.0 L 428.0 273.0 L 430.0 271.0 L 432.0 273.0 L 434.0 273.0 L 441.0 277.0 L 441.0 274.0 L 439.0 269.0 L 433.0 266.0 L 431.0 266.0 L 427.0 263.0 L 424.0 262.0 L 406.0 249.0 L 392.0 236.0 L 391.0 236.0 L 377.0 223.0 L 376.0 223.0 L 364.0 211.0 L 345.0 184.0 L 344.0 181.0 L 338.0 173.0 L 332.0 162.0 L 323.0 150.0 L 322.0 147.0 L 307.0 125.0 L 305.0 121.0 L 305.0 116.0 L 302.0 111.0 L 254.0 64.0 L 247.0 54.0 L 247.0 52.0 L 246.0 52.0 Z
+M 265.0 440.0 L 266.0 439.0 L 277.0 439.0 L 278.0 440.0 L 278.0 446.0 L 270.0 459.0 L 267.0 461.0 L 264.0 467.0 L 257.0 474.0 L 255.0 478.0 L 253.0 479.0 L 251.0 482.0 L 243.0 489.0 L 235.0 489.0 L 234.0 490.0 L 230.0 490.0 L 228.0 489.0 L 227.0 490.0 L 225.0 490.0 L 223.0 488.0 L 221.0 488.0 L 220.0 487.0 L 220.0 483.0 L 223.0 477.0 L 223.0 475.0 L 228.0 469.0 L 230.0 469.0 L 231.0 467.0 L 236.0 465.0 L 238.0 463.0 L 240.0 463.0 L 243.0 461.0 L 246.0 457.0 L 255.0 452.0 L 262.0 445.0 L 264.0 441.0 Z
+M 122.0 417.0 L 123.0 416.0 L 129.0 416.0 L 132.0 419.0 L 140.0 423.0 L 149.0 431.0 L 150.0 437.0 L 149.0 438.0 L 149.0 440.0 L 144.0 444.0 L 140.0 444.0 L 139.0 443.0 L 134.0 443.0 L 132.0 444.0 L 117.0 460.0 L 118.0 484.0 L 117.0 485.0 L 112.0 485.0 L 107.0 487.0 L 99.0 487.0 L 98.0 486.0 L 69.0 486.0 L 68.0 485.0 L 66.0 485.0 L 65.0 484.0 L 65.0 481.0 L 71.0 473.0 L 72.0 470.0 L 77.0 466.0 L 79.0 462.0 L 83.0 459.0 L 85.0 455.0 L 98.0 442.0 L 100.0 438.0 L 102.0 437.0 L 102.0 436.0 L 121.0 418.0 Z
+M 240.0 61.0 L 241.0 60.0 L 246.0 60.0 L 254.0 66.0 L 256.0 69.0 L 258.0 69.0 L 265.0 77.0 L 265.0 78.0 L 267.0 80.0 L 268.0 79.0 L 272.0 85.0 L 273.0 85.0 L 285.0 98.0 L 285.0 99.0 L 292.0 105.0 L 292.0 106.0 L 297.0 111.0 L 299.0 115.0 L 299.0 117.0 L 303.0 123.0 L 305.0 130.0 L 311.0 137.0 L 312.0 140.0 L 315.0 143.0 L 315.0 145.0 L 317.0 147.0 L 319.0 152.0 L 321.0 153.0 L 322.0 156.0 L 332.0 169.0 L 332.0 172.0 L 333.0 172.0 L 338.0 178.0 L 341.0 184.0 L 345.0 189.0 L 346.0 192.0 L 352.0 199.0 L 353.0 202.0 L 356.0 205.0 L 357.0 208.0 L 362.0 215.0 L 369.0 222.0 L 369.0 223.0 L 381.0 234.0 L 384.0 235.0 L 393.0 243.0 L 393.0 244.0 L 395.0 244.0 L 403.0 251.0 L 408.0 254.0 L 413.0 259.0 L 414.0 259.0 L 419.0 265.0 L 420.0 268.0 L 422.0 269.0 L 427.0 280.0 L 427.0 282.0 L 429.0 285.0 L 430.0 291.0 L 432.0 293.0 L 432.0 296.0 L 435.0 302.0 L 436.0 308.0 L 439.0 314.0 L 440.0 322.0 L 441.0 323.0 L 443.0 331.0 L 445.0 333.0 L 445.0 337.0 L 446.0 338.0 L 447.0 343.0 L 450.0 348.0 L 452.0 348.0 L 453.0 349.0 L 458.0 349.0 L 465.0 358.0 L 467.0 365.0 L 470.0 369.0 L 473.0 380.0 L 475.0 383.0 L 475.0 385.0 L 477.0 389.0 L 477.0 393.0 L 480.0 399.0 L 480.0 403.0 L 482.0 407.0 L 484.0 418.0 L 486.0 422.0 L 487.0 438.0 L 489.0 441.0 L 489.0 467.0 L 490.0 468.0 L 490.0 487.0 L 489.0 488.0 L 464.0 489.0 L 463.0 488.0 L 457.0 488.0 L 455.0 486.0 L 455.0 477.0 L 457.0 476.0 L 460.0 471.0 L 464.0 467.0 L 465.0 467.0 L 465.0 465.0 L 467.0 462.0 L 467.0 451.0 L 466.0 450.0 L 466.0 445.0 L 465.0 444.0 L 465.0 440.0 L 464.0 439.0 L 464.0 434.0 L 462.0 432.0 L 462.0 427.0 L 458.0 417.0 L 458.0 414.0 L 455.0 410.0 L 453.0 403.0 L 449.0 398.0 L 447.0 393.0 L 444.0 389.0 L 435.0 383.0 L 433.0 383.0 L 432.0 382.0 L 427.0 382.0 L 426.0 381.0 L 422.0 381.0 L 421.0 380.0 L 420.0 381.0 L 400.0 380.0 L 391.0 374.0 L 388.0 367.0 L 385.0 363.0 L 384.0 358.0 L 381.0 355.0 L 381.0 353.0 L 375.0 341.0 L 373.0 334.0 L 367.0 323.0 L 367.0 321.0 L 366.0 320.0 L 366.0 301.0 L 364.0 299.0 L 364.0 296.0 L 355.0 284.0 L 356.0 291.0 L 358.0 292.0 L 358.0 297.0 L 359.0 298.0 L 359.0 302.0 L 357.0 306.0 L 357.0 311.0 L 359.0 315.0 L 359.0 320.0 L 365.0 331.0 L 365.0 333.0 L 369.0 340.0 L 369.0 342.0 L 372.0 346.0 L 374.0 353.0 L 379.0 360.0 L 379.0 362.0 L 381.0 364.0 L 382.0 369.0 L 386.0 375.0 L 386.0 377.0 L 388.0 380.0 L 389.0 386.0 L 391.0 390.0 L 391.0 394.0 L 389.0 399.0 L 382.0 407.0 L 382.0 408.0 L 373.0 416.0 L 368.0 419.0 L 359.0 429.0 L 357.0 429.0 L 355.0 432.0 L 351.0 434.0 L 349.0 434.0 L 346.0 430.0 L 343.0 430.0 L 342.0 429.0 L 340.0 430.0 L 335.0 435.0 L 335.0 436.0 L 329.0 440.0 L 318.0 452.0 L 318.0 454.0 L 317.0 455.0 L 317.0 463.0 L 318.0 464.0 L 318.0 467.0 L 321.0 473.0 L 322.0 480.0 L 323.0 481.0 L 323.0 483.0 L 319.0 486.0 L 286.0 486.0 L 285.0 485.0 L 269.0 485.0 L 268.0 484.0 L 263.0 484.0 L 262.0 483.0 L 262.0 481.0 L 269.0 469.0 L 273.0 466.0 L 274.0 463.0 L 279.0 458.0 L 279.0 457.0 L 283.0 454.0 L 288.0 445.0 L 291.0 443.0 L 299.0 431.0 L 307.0 422.0 L 311.0 415.0 L 315.0 412.0 L 315.0 410.0 L 317.0 408.0 L 320.0 402.0 L 320.0 400.0 L 318.0 398.0 L 304.0 397.0 L 303.0 396.0 L 298.0 396.0 L 297.0 397.0 L 295.0 397.0 L 294.0 396.0 L 292.0 397.0 L 300.0 401.0 L 306.0 407.0 L 306.0 409.0 L 301.0 419.0 L 293.0 427.0 L 288.0 430.0 L 283.0 430.0 L 282.0 431.0 L 258.0 431.0 L 258.0 432.0 L 256.0 433.0 L 253.0 437.0 L 245.0 436.0 L 243.0 434.0 L 238.0 433.0 L 236.0 431.0 L 230.0 428.0 L 224.0 428.0 L 223.0 427.0 L 218.0 432.0 L 211.0 431.0 L 207.0 428.0 L 202.0 426.0 L 200.0 424.0 L 200.0 417.0 L 201.0 416.0 L 201.0 413.0 L 205.0 402.0 L 205.0 381.0 L 206.0 380.0 L 206.0 372.0 L 205.0 371.0 L 205.0 357.0 L 204.0 356.0 L 204.0 353.0 L 202.0 352.0 L 201.0 353.0 L 199.0 353.0 L 198.0 358.0 L 197.0 359.0 L 197.0 365.0 L 201.0 368.0 L 201.0 372.0 L 202.0 373.0 L 202.0 382.0 L 203.0 383.0 L 203.0 393.0 L 201.0 397.0 L 201.0 404.0 L 197.0 412.0 L 188.0 421.0 L 188.0 422.0 L 184.0 426.0 L 184.0 428.0 L 181.0 432.0 L 179.0 433.0 L 161.0 433.0 L 156.0 429.0 L 150.0 421.0 L 147.0 420.0 L 139.0 414.0 L 137.0 414.0 L 129.0 406.0 L 123.0 397.0 L 121.0 396.0 L 116.0 390.0 L 116.0 388.0 L 110.0 382.0 L 110.0 381.0 L 106.0 378.0 L 91.0 357.0 L 89.0 356.0 L 89.0 354.0 L 86.0 351.0 L 81.0 339.0 L 80.0 331.0 L 81.0 330.0 L 81.0 317.0 L 83.0 315.0 L 83.0 310.0 L 84.0 309.0 L 84.0 305.0 L 85.0 304.0 L 85.0 297.0 L 86.0 296.0 L 86.0 292.0 L 87.0 291.0 L 87.0 282.0 L 86.0 281.0 L 88.0 279.0 L 89.0 262.0 L 90.0 261.0 L 90.0 253.0 L 91.0 252.0 L 91.0 248.0 L 92.0 247.0 L 92.0 239.0 L 94.0 235.0 L 94.0 232.0 L 97.0 226.0 L 102.0 220.0 L 107.0 209.0 L 109.0 207.0 L 109.0 205.0 L 112.0 199.0 L 114.0 197.0 L 113.0 195.0 L 117.0 189.0 L 117.0 186.0 L 119.0 183.0 L 119.0 181.0 L 122.0 177.0 L 123.0 173.0 L 126.0 169.0 L 127.0 165.0 L 129.0 164.0 L 130.0 159.0 L 135.0 153.0 L 138.0 152.0 L 143.0 148.0 L 143.0 146.0 L 147.0 143.0 L 153.0 134.0 L 157.0 130.0 L 159.0 126.0 L 163.0 122.0 L 164.0 118.0 L 167.0 116.0 L 169.0 112.0 L 178.0 101.0 L 180.0 97.0 L 182.0 96.0 L 187.0 90.0 L 195.0 84.0 L 198.0 83.0 L 201.0 80.0 L 203.0 80.0 L 205.0 78.0 L 210.0 76.0 L 214.0 73.0 L 218.0 72.0 L 220.0 70.0 L 223.0 70.0 L 225.0 68.0 L 230.0 68.0 L 239.0 61.0 Z" fill-rule="evenodd"/>
+</g>
+</svg>
+    </div>
+  </section>
+
+  <!-- БЛОК ФАКТОВ — В СТИЛЕ БОЛЬШОЙ ТИПОГРАФИКИ -->
+  <section class="facts facts-showcase" id="facts">
+    <div class="facts-bg-number" aria-hidden="true">01</div>
+    <div class="container">
+      <div class="facts-intro">
+        <div class="facts-kicker" data-lang-key="facts.kicker">ЗУБРМОНТАЖСТРОЙ / 2026</div>
+        <h2 data-lang-key="facts.title">Опыт, масштаб,<br><span>результат.</span></h2>
+      </div>
+
+      <div class="facts-list">
+        <article class="fact-slide fact-slide-1">
+          <div class="fact-index">01</div>
+          <div class="fact-main">
+            <div class="fact-number">10+</div>
+            <div class="fact-line"></div>
+            <div class="fact-label" data-lang-key="fact1">лет строительной практики</div>
+          </div>
+          <div class="fact-side">
+            <span><b>01</b> ОПЫТ</span>
+            <p>Более десяти лет превращаем инженерные задачи в готовые решения.</p>
+          </div>
+        </article>
+
+        <article class="fact-slide fact-slide-2">
+          <div class="fact-index">02</div>
+          <div class="fact-main">
+            <div class="fact-number">120</div>
+            <div class="fact-line"></div>
+            <div class="fact-label" data-lang-key="fact2">объектов доведено до результата</div>
+          </div>
+          <div class="fact-side">
+            <span><b>02</b> МАСШТАБ</span>
+            <p>От отдельных монтажных работ до комплексной реализации объектов.</p>
+          </div>
+        </article>
+
+        <article class="fact-slide fact-slide-3">
+          <div class="fact-index">03</div>
+          <div class="fact-main">
+            <div class="fact-number">98%</div>
+            <div class="fact-line"></div>
+            <div class="fact-label" data-lang-key="fact3">клиентов рекомендуют нас</div>
+          </div>
+          <div class="fact-side">
+            <span><b>03</b> ДОВЕРИЕ</span>
+            <p>Сроки, качество и договорённости — ключевые показатели нашей работы.</p>
+          </div>
+        </article>
+
+        <article class="fact-slide fact-slide-4">
+          <div class="fact-index">04</div>
+          <div class="fact-main">
+            <div class="fact-number">5 <small>лет</small></div>
+            <div class="fact-line"></div>
+            <div class="fact-label" data-lang-key="fact4">защищаем результат гарантией</div>
+          </div>
+          <div class="fact-side">
+            <span><b>04</b> ГАРАНТИЯ</span>
+            <p>Закрепляем ответственность за выполненные работы и их результат.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- УСЛУГИ -->
+  <section class="services-section" id="services">
+    <div class="container">
+      <div class="section-kicker-pro">01 / НАШИ УСЛУГИ</div>
+      <h2 class="section-title-pro">Строим <span>результат.</span></h2>
+      <div class="services-grid-pro">
+        <article class="service-card-pro fade-up">
+          <span class="service-num-pro">01</span>
+          <h3 data-lang-key="service1.title">Строительство жилых комплексов</h3>
+          <p data-lang-key="service1.desc">Многоэтажные дома, коттеджные посёлки, таунхаусы — полный цикл от проекта до ввода в эксплуатацию.</p>
+          <span class="service-arrow-pro">↗</span>
+        </article>
+        <article class="service-card-pro fade-up">
+          <span class="service-num-pro">02</span>
+          <h3 data-lang-key="service2.title">Промышленное строительство</h3>
+          <p data-lang-key="service2.desc">Заводы, склады, логистические центры — строим с учётом технологических требований и особенностей объекта.</p>
+          <span class="service-arrow-pro">↗</span>
+        </article>
+        <article class="service-card-pro fade-up">
+          <span class="service-num-pro">03</span>
+          <h3 data-lang-key="service3.title">Инженерные сети и инфраструктура</h3>
+          <p data-lang-key="service3.desc">Водоснабжение, канализация, теплотрассы, дороги — комплексные решения для любых объектов.</p>
+          <span class="service-arrow-pro">↗</span>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ТЕХНИКА -->
+  <section class="equipment equipment-enhanced" id="equipment">
+    <div class="container">
+      <div class="equipment-enhanced-head">
+        <div>
+          <div class="equipment-enhanced-kicker">03 / ПАРК ТЕХНИКИ</div>
+          <h2 class="equipment-enhanced-title">Техника,<br><span>готовая к работе.</span></h2>
+        </div>
+        <p class="equipment-enhanced-intro">
+          Три специализированные машины для земляных, погрузочных и высотных
+          работ. Наведите курсор на карточку, чтобы увидеть основные характеристики.
+        </p>
+      </div>
+
+      <div class="equipment-enhanced-grid">
+
+        <!-- 01 — LiuGong CLG777A -->
+        <article class="equipment-enhanced-card fade-up">
+          <div class="equipment-enhanced-photo">
+            <span class="equipment-enhanced-number">01</span>
+            <div class="equipment-enhanced-status"><i></i> В РАБОТЕ</div>
+            <img
+              src="https://img.directindustry.com.ru/images_di/photo-g/54193-17325738.webp"
+              alt="LiuGong CLG777A — экскаватор-погрузчик"
+              loading="lazy"
+              decoding="async">
+            <div class="equipment-enhanced-shine"></div>
+
+            <div class="equipment-enhanced-specs">
+              <div class="equipment-enhanced-specs-head">
+                <span>ХАРАКТЕРИСТИКИ</span>
+                <b>CLG777A</b>
+              </div>
+
+              <div class="equipment-enhanced-spec">
+                <span>Эксплуатационная масса</span>
+                <strong>8 400 кг</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Мощность</span>
+                <strong>70 кВт / 95 л.с.</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Глубина копания</span>
+                <strong>4 440 мм</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Ковш погрузчика</span>
+                <strong>1,0 м³</strong>
+              </div>
+
+              <div class="equipment-enhanced-meter">
+                <span>Земляные работы</span>
+                <div><i style="--value:96%"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-enhanced-info">
+            <div>
+              <h3>LiuGong CLG777A</h3>
+              <p>Экскаватор-погрузчик для земляных работ, погрузки материалов и подготовки площадок.</p>
+            </div>
+            <span class="equipment-enhanced-arrow">↗</span>
+          </div>
+        </article>
+
+        <!-- 02 — Manitou MT 1440 -->
+        <article class="equipment-enhanced-card fade-up">
+          <div class="equipment-enhanced-photo">
+            <span class="equipment-enhanced-number">02</span>
+            <div class="equipment-enhanced-status"><i></i> В РАБОТЕ</div>
+            <img
+              src="https://eqsk4m2dkju.exactdn.com/app/uploads/sites/15/2024/02/MAN-MT1440-1.jpg?avif=80&lossy=1&quality=92&sharp=1&ssl=1&strip=all&webp=92"
+              alt="Manitou MT 1440 — телескопический погрузчик"
+              loading="lazy"
+              decoding="async">
+            <div class="equipment-enhanced-shine"></div>
+
+            <div class="equipment-enhanced-specs">
+              <div class="equipment-enhanced-specs-head">
+                <span>ХАРАКТЕРИСТИКИ</span>
+                <b>MT 1440</b>
+              </div>
+
+              <div class="equipment-enhanced-spec">
+                <span>Макс. грузоподъёмность</span>
+                <strong>4 000 кг</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Высота подъёма</span>
+                <strong>13,53 м</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Макс. вылет</span>
+                <strong>9,46 м</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Мощность двигателя</span>
+                <strong>75 кВт</strong>
+              </div>
+
+              <div class="equipment-enhanced-meter">
+                <span>Погрузочно-монтажные работы</span>
+                <div><i style="--value:91%"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-enhanced-info">
+            <div>
+              <h3>Manitou MT 1440</h3>
+              <p>Телескопический погрузчик для подачи, перемещения и подъёма материалов на объекте.</p>
+            </div>
+            <span class="equipment-enhanced-arrow">↗</span>
+          </div>
+        </article>
+
+        <!-- 03 — JCB 220X -->
+        <article class="equipment-enhanced-card fade-up">
+          <div class="equipment-enhanced-photo">
+            <span class="equipment-enhanced-number">03</span>
+            <div class="equipment-enhanced-status"><i></i> В РАБОТЕ</div>
+            <img
+              src="https://purepng.com/public/uploads/medium/purepng.com-excavatorexcavatordiggergrubbergrubbersexcavators-1701527843218fzkjl.png"
+              alt="Гусеничный экскаватор JCB"
+              loading="lazy"
+              decoding="async">
+            <div class="equipment-enhanced-shine"></div>
+
+            <div class="equipment-enhanced-specs">
+              <div class="equipment-enhanced-specs-head">
+                <span>ХАРАКТЕРИСТИКИ</span>
+                <b>220X</b>
+              </div>
+
+              <div class="equipment-enhanced-spec">
+                <span>Эксплуатационная масса</span>
+                <strong>24 743 кг</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Мощность двигателя</span>
+                <strong>129 кВт</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Глубина копания</span>
+                <strong>6 694 мм</strong>
+              </div>
+              <div class="equipment-enhanced-spec">
+                <span>Ковш</span>
+                <strong>до 1,25 м³</strong>
+              </div>
+
+              <div class="equipment-enhanced-meter">
+                <span>Земляные работы</span>
+                <div><i style="--value:98%"></i></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="equipment-enhanced-info">
+            <div>
+              <h3>Гусеничный экскаватор JCB</h3>
+              <p>Техника для разработки грунта, планировки и подготовки строительных площадок.</p>
+            </div>
+            <span class="equipment-enhanced-arrow">↗</span>
+          </div>
+        </article>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- НАШИ ПРОЕКТЫ -->
+  <section class="projects" id="projects">
+    <div class="container">
+      <div class="projects-head">
+        <div>
+          <div class="projects-kicker" data-lang-key="projects.kicker">Наши проекты</div>
+          <h2 class="projects-title" data-lang-key="projects.title">Опыт, масштаб и результат</h2>
+        </div>
+        <p class="projects-subtitle" data-lang-key="projects.intro">Реализуем строительные проекты от инженерной подготовки до полного ввода объекта в эксплуатацию.</p>
+      </div>
+      <div class="projects-list">
+        <!-- Первая карточка с изображением -->
+        <article class="project-card fade-up">
+          <img class="project-image" src="https://io.sb.by/storage01/iblock/94d/94d42423f2d8c700223885f941e8f745/990fd43b9a9f1f1e35f6dcbd67160e77.jpg" alt="Осиповичское РОВД" loading="lazy" decoding="async">
+          <span class="project-index">01</span>
+          <h3 data-lang-key="project1.title">Осиповичское РОВД</h3>
+          <div class="project-meta" data-lang-key="project1.meta">Осиповичи · строительный объект</div>
+        </article>
+        <article class="project-card fade-up">
+          <img class="project-image" src="https://mogilevnews.by/wp-content/uploads/2020/12/o1.jpg" alt="Следственный комитет г. Осиповичи" loading="lazy" decoding="async">
+          <span class="project-index">02</span>
+          <h3 data-lang-key="project5.title">Следственный комитет г. Осиповичи</h3>
+          <div class="project-meta" data-lang-key="project5.meta">Осиповичи · строительный объект</div>
+        </article>
+        <article class="project-card fade-up project-card-hotel">
+          <img class="project-image" src="https://avatars.mds.yandex.net/get-altay/9954022/2a00000189a539d4932f7f45e188a6fd9824/orig" alt="Гостиница г. Осиповичи" loading="lazy" decoding="async">
+          <span class="project-index">03</span>
+          <h3 data-lang-key="project6.title">Гостиница г. Осиповичи</h3>
+          <div class="project-meta" data-lang-key="project6.meta">Осиповичи · гостиница</div>
+        </article>
+        
+      </div>
+      <a class="projects-cta" href="#footer" data-lang-key="projects.cta">Обсудить новый проект →</a>
+    </div>
+  </section>
+
+  <!-- ПОЧЕМУ МЫ -->
+  <section class="why-section-pro" id="advantages">
+    <div class="container">
+      <div class="section-kicker-pro">02 / ПОЧЕМУ МЫ</div>
+      <h2 class="section-title-pro" data-lang-key="advantages.title">Почему <span>мы?</span></h2>
+      <div class="advantages-grid-pro">
+        <article class="advantage-item-pro fade-up">
+          <div class="adv-number-pro">01</div>
+          <div class="advantage-content-pro">
+            <h4 data-lang-key="adv1.title">Работаем в любых условиях</h4>
+            <p data-lang-key="adv1.desc">Опыт строительства в разных условиях и готовность решать нестандартные задачи.</p>
+          </div>
+        </article>
+        <article class="advantage-item-pro fade-up">
+          <div class="adv-number-pro">02</div>
+          <div class="advantage-content-pro">
+            <h4 data-lang-key="adv2.title">Собственный парк техники</h4>
+            <p data-lang-key="adv2.desc">Краны, экскаваторы, бульдозеры — обеспечиваем проект необходимыми ресурсами.</p>
+          </div>
+        </article>
+        <article class="advantage-item-pro fade-up">
+          <div class="adv-number-pro">03</div>
+          <div class="advantage-content-pro">
+            <h4 data-lang-key="adv3.title">Инженерный подход</h4>
+            <p data-lang-key="adv3.desc">Точные расчёты, современные материалы и системная организация строительного процесса.</p>
+          </div>
+        </article>
+        <article class="advantage-item-pro fade-up">
+          <div class="adv-number-pro">04</div>
+          <div class="advantage-content-pro">
+            <h4 data-lang-key="adv4.title">Гарантия 5 лет</h4>
+            <p data-lang-key="adv4.desc">Закрепляем ответственность за выполненные работы и результат.</p>
+          </div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- ФУТЕР -->
+  <footer id="footer">
+    <div class="footer-wrap container">
+      <div class="footer-col">
+        <div class="footer-brand">
+          <svg class="footer-zubr" viewBox="0 0 535 506" xmlns="http://www.w3.org/2000/svg" aria-label="Зубр — ЗубрМонтажСтрой">
+        <g class="zubr-shadow">
+<path fill="#bdbdbd" d="M 203.0 460.0 L 202.0 462.0 L 206.0 462.0 L 204.0 461.0 Z
+M 57.0 342.0 L 61.0 357.0 L 71.0 362.0 L 75.0 366.0 L 73.0 369.0 L 75.0 367.0 L 81.0 373.0 L 80.0 375.0 L 85.0 379.0 L 101.0 400.0 L 102.0 407.0 L 97.0 414.0 L 90.0 421.0 L 89.0 420.0 L 90.0 421.0 L 86.0 425.0 L 84.0 425.0 L 85.0 426.0 L 70.0 441.0 L 69.0 444.0 L 66.0 445.0 L 64.0 449.0 L 56.0 457.0 L 54.0 457.0 L 52.0 461.0 L 51.0 460.0 L 50.0 463.0 L 45.0 468.0 L 44.0 472.0 L 44.0 487.0 L 45.0 488.0 L 57.0 473.0 L 82.0 447.0 L 83.0 444.0 L 96.0 432.0 L 118.0 407.0 L 118.0 405.0 L 114.0 401.0 L 78.0 351.0 L 66.0 344.0 L 58.0 343.0 Z
+M 57.0 324.0 L 57.0 329.0 L 64.0 331.0 L 74.0 330.0 L 74.0 328.0 L 67.0 325.0 L 58.0 325.0 Z
+M 69.0 330.0 L 70.0 329.0 L 73.0 330.0 L 70.0 331.0 Z
+M 64.0 330.0 L 65.0 329.0 L 68.0 330.0 L 65.0 331.0 Z
+M 430.0 272.0 L 429.0 273.0 L 433.0 280.0 L 433.0 284.0 L 437.0 293.0 L 438.0 301.0 L 442.0 307.0 L 442.0 312.0 L 445.0 316.0 L 447.0 328.0 L 452.0 336.0 L 452.0 341.0 L 453.0 342.0 L 457.0 340.0 L 463.0 340.0 L 473.0 365.0 L 477.0 372.0 L 477.0 375.0 L 480.0 380.0 L 480.0 383.0 L 491.0 413.0 L 498.0 441.0 L 499.0 454.0 L 503.0 464.0 L 500.0 488.0 L 498.0 493.0 L 489.0 493.0 L 488.0 494.0 L 457.0 494.0 L 455.0 493.0 L 454.0 494.0 L 448.0 494.0 L 445.0 492.0 L 446.0 482.0 L 449.0 473.0 L 461.0 460.0 L 459.0 442.0 L 452.0 417.0 L 445.0 403.0 L 442.0 401.0 L 440.0 396.0 L 434.0 390.0 L 423.0 390.0 L 422.0 389.0 L 407.0 388.0 L 404.0 390.0 L 400.0 400.0 L 390.0 413.0 L 371.0 432.0 L 341.0 458.0 L 339.0 457.0 L 338.0 447.0 L 335.0 448.0 L 327.0 456.0 L 326.0 463.0 L 336.0 483.0 L 339.0 491.0 L 338.0 493.0 L 241.0 493.0 L 240.0 494.0 L 209.0 493.0 L 208.0 490.0 L 212.0 483.0 L 212.0 481.0 L 222.0 465.0 L 228.0 460.0 L 243.0 453.0 L 246.0 449.0 L 243.0 445.0 L 233.0 440.0 L 226.0 449.0 L 224.0 449.0 L 202.0 438.0 L 197.0 437.0 L 190.0 443.0 L 174.0 443.0 L 173.0 444.0 L 157.0 445.0 L 155.0 447.0 L 153.0 447.0 L 150.0 453.0 L 143.0 460.0 L 138.0 463.0 L 135.0 463.0 L 131.0 459.0 L 129.0 459.0 L 124.0 467.0 L 124.0 472.0 L 131.0 487.0 L 131.0 493.0 L 130.0 494.0 L 113.0 494.0 L 112.0 493.0 L 110.0 494.0 L 103.0 494.0 L 102.0 493.0 L 99.0 494.0 L 98.0 493.0 L 63.0 493.0 L 62.0 494.0 L 55.0 494.0 L 54.0 493.0 L 46.0 493.0 L 46.0 495.0 L 51.0 501.0 L 70.0 501.0 L 71.0 502.0 L 70.0 503.0 L 79.0 503.0 L 87.0 501.0 L 133.0 501.0 L 140.0 492.0 L 141.0 489.0 L 140.0 480.0 L 142.0 478.0 L 142.0 471.0 L 145.0 468.0 L 149.0 468.0 L 154.0 466.0 L 155.0 464.0 L 158.0 463.0 L 157.0 462.0 L 165.0 457.0 L 169.0 456.0 L 187.0 456.0 L 197.0 451.0 L 200.0 453.0 L 204.0 453.0 L 211.0 457.0 L 210.0 462.0 L 207.0 467.0 L 205.0 468.0 L 206.0 469.0 L 197.0 483.0 L 198.0 495.0 L 201.0 501.0 L 206.0 500.0 L 218.0 500.0 L 219.0 501.0 L 318.0 500.0 L 319.0 502.0 L 322.0 502.0 L 323.0 500.0 L 328.0 500.0 L 330.0 502.0 L 331.0 500.0 L 339.0 500.0 L 345.0 492.0 L 347.0 484.0 L 347.0 480.0 L 345.0 477.0 L 345.0 474.0 L 343.0 472.0 L 346.0 469.0 L 344.0 461.0 L 348.0 457.0 L 357.0 457.0 L 361.0 456.0 L 363.0 454.0 L 364.0 455.0 L 372.0 446.0 L 377.0 446.0 L 384.0 439.0 L 385.0 436.0 L 384.0 434.0 L 388.0 431.0 L 387.0 430.0 L 390.0 429.0 L 416.0 403.0 L 428.0 403.0 L 433.0 407.0 L 432.0 408.0 L 437.0 410.0 L 437.0 412.0 L 441.0 417.0 L 446.0 432.0 L 446.0 437.0 L 449.0 446.0 L 449.0 453.0 L 447.0 455.0 L 446.0 459.0 L 441.0 465.0 L 441.0 468.0 L 438.0 474.0 L 438.0 478.0 L 436.0 482.0 L 436.0 486.0 L 433.0 487.0 L 434.0 489.0 L 432.0 492.0 L 434.0 499.0 L 435.0 500.0 L 510.0 500.0 L 512.0 497.0 L 512.0 492.0 L 510.0 487.0 L 511.0 486.0 L 515.0 487.0 L 515.0 473.0 L 514.0 472.0 L 514.0 461.0 L 512.0 455.0 L 512.0 443.0 L 507.0 431.0 L 508.0 429.0 L 506.0 426.0 L 504.0 417.0 L 502.0 415.0 L 501.0 409.0 L 498.0 404.0 L 499.0 402.0 L 497.0 401.0 L 497.0 397.0 L 494.0 392.0 L 492.0 382.0 L 489.0 378.0 L 489.0 374.0 L 487.0 373.0 L 488.0 371.0 L 486.0 370.0 L 486.0 366.0 L 483.0 362.0 L 481.0 353.0 L 479.0 350.0 L 479.0 345.0 L 476.0 343.0 L 475.0 337.0 L 472.0 332.0 L 472.0 329.0 L 467.0 324.0 L 459.0 324.0 L 457.0 322.0 L 458.0 319.0 L 457.0 320.0 L 455.0 318.0 L 455.0 313.0 L 453.0 311.0 L 451.0 305.0 L 452.0 303.0 L 454.0 303.0 L 452.0 303.0 L 449.0 298.0 L 450.0 295.0 L 453.0 297.0 L 452.0 298.0 L 453.0 299.0 L 455.0 296.0 L 459.0 297.0 L 454.0 282.0 L 445.0 280.0 L 431.0 273.0 Z
+M 381.0 437.0 L 382.0 436.0 L 383.0 437.0 L 382.0 439.0 L 381.0 438.0 Z
+M 382.0 436.0 L 383.0 435.0 L 385.0 436.0 L 383.0 437.0 Z
+M 438.0 249.0 L 438.0 251.0 L 441.0 252.0 L 439.0 249.0 Z
+M 248.0 37.0 L 243.0 39.0 L 241.0 38.0 L 240.0 40.0 L 238.0 38.0 L 232.0 38.0 L 235.0 41.0 L 232.0 44.0 L 231.0 43.0 L 225.0 48.0 L 219.0 49.0 L 217.0 52.0 L 212.0 55.0 L 209.0 54.0 L 205.0 59.0 L 202.0 58.0 L 199.0 61.0 L 197.0 61.0 L 195.0 58.0 L 189.0 59.0 L 182.0 66.0 L 180.0 70.0 L 176.0 73.0 L 175.0 77.0 L 173.0 79.0 L 171.0 79.0 L 168.0 86.0 L 167.0 85.0 L 164.0 92.0 L 155.0 103.0 L 151.0 110.0 L 148.0 112.0 L 148.0 114.0 L 143.0 118.0 L 136.0 118.0 L 132.0 120.0 L 130.0 125.0 L 127.0 128.0 L 128.0 129.0 L 127.0 131.0 L 123.0 132.0 L 125.0 136.0 L 120.0 145.0 L 120.0 147.0 L 118.0 149.0 L 114.0 159.0 L 113.0 158.0 L 114.0 160.0 L 111.0 164.0 L 110.0 163.0 L 111.0 165.0 L 110.0 170.0 L 104.0 179.0 L 105.0 180.0 L 101.0 190.0 L 98.0 193.0 L 96.0 192.0 L 93.0 194.0 L 87.0 195.0 L 85.0 197.0 L 82.0 216.0 L 80.0 220.0 L 81.0 226.0 L 80.0 229.0 L 78.0 230.0 L 79.0 236.0 L 75.0 256.0 L 74.0 270.0 L 72.0 276.0 L 72.0 286.0 L 70.0 292.0 L 70.0 298.0 L 65.0 305.0 L 63.0 304.0 L 59.0 305.0 L 58.0 317.0 L 57.0 318.0 L 74.0 318.0 L 76.0 314.0 L 79.0 303.0 L 79.0 295.0 L 82.0 288.0 L 82.0 282.0 L 85.0 271.0 L 85.0 255.0 L 89.0 241.0 L 89.0 232.0 L 91.0 228.0 L 92.0 214.0 L 94.0 213.0 L 98.0 215.0 L 102.0 212.0 L 104.0 207.0 L 104.0 203.0 L 108.0 199.0 L 111.0 192.0 L 111.0 188.0 L 116.0 181.0 L 117.0 175.0 L 123.0 165.0 L 126.0 158.0 L 126.0 155.0 L 129.0 152.0 L 134.0 140.0 L 136.0 139.0 L 140.0 143.0 L 151.0 130.0 L 153.0 125.0 L 158.0 120.0 L 160.0 115.0 L 163.0 113.0 L 176.0 95.0 L 177.0 92.0 L 188.0 79.0 L 193.0 79.0 L 196.0 77.0 L 199.0 77.0 L 204.0 73.0 L 208.0 72.0 L 244.0 51.0 L 247.0 51.0 L 252.0 60.0 L 260.0 66.0 L 263.0 70.0 L 265.0 70.0 L 268.0 73.0 L 268.0 75.0 L 272.0 79.0 L 275.0 80.0 L 287.0 92.0 L 292.0 100.0 L 304.0 111.0 L 306.0 116.0 L 306.0 121.0 L 312.0 131.0 L 318.0 138.0 L 319.0 142.0 L 321.0 143.0 L 327.0 154.0 L 331.0 157.0 L 331.0 160.0 L 339.0 173.0 L 343.0 176.0 L 346.0 184.0 L 352.0 190.0 L 352.0 192.0 L 356.0 197.0 L 356.0 199.0 L 361.0 206.0 L 365.0 209.0 L 365.0 211.0 L 391.0 235.0 L 410.0 251.0 L 414.0 252.0 L 421.0 259.0 L 440.0 269.0 L 450.0 271.0 L 449.0 266.0 L 442.0 255.0 L 432.0 251.0 L 429.0 248.0 L 427.0 248.0 L 426.0 247.0 L 427.0 246.0 L 426.0 247.0 L 425.0 245.0 L 420.0 243.0 L 413.0 236.0 L 401.0 227.0 L 399.0 224.0 L 395.0 222.0 L 391.0 217.0 L 389.0 217.0 L 377.0 206.0 L 378.0 205.0 L 377.0 206.0 L 373.0 202.0 L 370.0 196.0 L 369.0 190.0 L 366.0 188.0 L 364.0 190.0 L 361.0 187.0 L 359.0 183.0 L 361.0 182.0 L 355.0 177.0 L 351.0 171.0 L 350.0 167.0 L 345.0 162.0 L 345.0 160.0 L 343.0 158.0 L 344.0 157.0 L 342.0 155.0 L 341.0 156.0 L 339.0 151.0 L 336.0 148.0 L 337.0 144.0 L 335.0 145.0 L 334.0 142.0 L 330.0 138.0 L 329.0 132.0 L 324.0 127.0 L 324.0 124.0 L 322.0 120.0 L 322.0 116.0 L 324.0 114.0 L 322.0 116.0 L 321.0 112.0 L 320.0 113.0 L 318.0 109.0 L 290.0 81.0 L 286.0 76.0 L 286.0 74.0 L 284.0 75.0 L 283.0 74.0 L 284.0 73.0 L 277.0 68.0 L 266.0 57.0 L 267.0 56.0 L 263.0 53.0 L 262.0 51.0 L 263.0 48.0 L 260.0 47.0 L 258.0 40.0 L 255.0 37.0 L 249.0 37.0 Z
+M 367.0 193.0 L 368.0 192.0 L 369.0 193.0 L 368.0 195.0 L 367.0 194.0 Z
+M 201.0 59.0 L 202.0 58.0 L 204.0 59.0 L 202.0 60.0 Z" fill-rule="evenodd"/>
+</g>
+<g class="zubr-art">
+<path fill="#f60000" d="M 268.0 442.0 L 266.0 443.0 L 264.0 448.0 L 259.0 453.0 L 256.0 454.0 L 251.0 459.0 L 227.0 474.0 L 224.0 481.0 L 224.0 485.0 L 230.0 487.0 L 231.0 486.0 L 243.0 486.0 L 254.0 473.0 L 257.0 471.0 L 273.0 449.0 L 274.0 444.0 L 269.0 442.0 Z
+M 124.0 419.0 L 111.0 431.0 L 96.0 449.0 L 82.0 463.0 L 71.0 477.0 L 72.0 479.0 L 71.0 482.0 L 72.0 483.0 L 110.0 483.0 L 115.0 479.0 L 113.0 460.0 L 122.0 452.0 L 133.0 439.0 L 137.0 439.0 L 141.0 441.0 L 144.0 441.0 L 146.0 439.0 L 146.0 432.0 L 141.0 427.0 L 135.0 424.0 L 132.0 421.0 L 128.0 419.0 L 125.0 419.0 Z
+M 95.0 246.0 L 94.0 266.0 L 96.0 256.0 L 96.0 249.0 L 95.0 248.0 L 96.0 247.0 Z
+M 128.0 174.0 L 126.0 176.0 L 125.0 182.0 L 122.0 184.0 L 120.0 188.0 L 120.0 190.0 L 110.0 211.0 L 108.0 213.0 L 107.0 217.0 L 98.0 231.0 L 98.0 234.0 L 96.0 238.0 L 96.0 244.0 L 97.0 245.0 L 100.0 241.0 L 106.0 239.0 L 114.0 226.0 L 126.0 189.0 L 127.0 182.0 L 129.0 179.0 L 129.0 175.0 Z
+M 178.0 107.0 L 173.0 111.0 L 171.0 117.0 L 168.0 118.0 L 165.0 124.0 L 158.0 132.0 L 157.0 136.0 L 152.0 140.0 L 148.0 146.0 L 139.0 155.0 L 137.0 155.0 L 134.0 158.0 L 134.0 163.0 L 131.0 165.0 L 131.0 168.0 L 134.0 167.0 L 136.0 164.0 L 146.0 166.0 L 150.0 159.0 L 150.0 157.0 L 173.0 120.0 L 178.0 108.0 Z
+M 242.0 63.0 L 224.0 76.0 L 223.0 75.0 L 224.0 72.0 L 222.0 74.0 L 217.0 75.0 L 210.0 80.0 L 200.0 84.0 L 197.0 87.0 L 194.0 88.0 L 193.0 90.0 L 190.0 91.0 L 191.0 92.0 L 190.0 95.0 L 194.0 99.0 L 201.0 96.0 L 209.0 89.0 L 211.0 90.0 L 199.0 104.0 L 195.0 107.0 L 185.0 111.0 L 178.0 119.0 L 177.0 123.0 L 174.0 126.0 L 162.0 148.0 L 162.0 150.0 L 147.0 176.0 L 142.0 182.0 L 137.0 179.0 L 134.0 183.0 L 130.0 193.0 L 130.0 196.0 L 120.0 219.0 L 110.0 250.0 L 105.0 255.0 L 103.0 259.0 L 102.0 335.0 L 104.0 344.0 L 115.0 358.0 L 121.0 371.0 L 120.0 372.0 L 107.0 358.0 L 100.0 348.0 L 100.0 346.0 L 95.0 338.0 L 94.0 330.0 L 92.0 325.0 L 93.0 276.0 L 94.0 275.0 L 93.0 271.0 L 91.0 272.0 L 90.0 295.0 L 85.0 315.0 L 85.0 322.0 L 84.0 323.0 L 84.0 338.0 L 91.0 353.0 L 98.0 363.0 L 105.0 370.0 L 107.0 374.0 L 114.0 381.0 L 119.0 389.0 L 125.0 395.0 L 130.0 403.0 L 138.0 411.0 L 151.0 418.0 L 157.0 424.0 L 160.0 429.0 L 164.0 430.0 L 177.0 430.0 L 179.0 429.0 L 183.0 422.0 L 195.0 409.0 L 199.0 396.0 L 199.0 373.0 L 198.0 368.0 L 194.0 367.0 L 192.0 365.0 L 196.0 351.0 L 199.0 348.0 L 202.0 347.0 L 206.0 348.0 L 208.0 352.0 L 209.0 396.0 L 208.0 397.0 L 207.0 407.0 L 203.0 419.0 L 203.0 422.0 L 208.0 426.0 L 213.0 428.0 L 218.0 428.0 L 219.0 425.0 L 221.0 423.0 L 233.0 426.0 L 251.0 435.0 L 258.0 428.0 L 284.0 428.0 L 291.0 425.0 L 298.0 418.0 L 301.0 412.0 L 301.0 406.0 L 299.0 404.0 L 283.0 397.0 L 280.0 394.0 L 281.0 392.0 L 287.0 391.0 L 288.0 392.0 L 313.0 394.0 L 323.0 396.0 L 324.0 400.0 L 318.0 410.0 L 318.0 412.0 L 314.0 416.0 L 311.0 422.0 L 305.0 428.0 L 305.0 430.0 L 267.0 477.0 L 268.0 481.0 L 270.0 482.0 L 288.0 482.0 L 289.0 483.0 L 313.0 483.0 L 317.0 482.0 L 320.0 479.0 L 313.0 463.0 L 313.0 457.0 L 316.0 450.0 L 329.0 436.0 L 343.0 424.0 L 345.0 424.0 L 348.0 428.0 L 352.0 430.0 L 354.0 429.0 L 366.0 417.0 L 373.0 412.0 L 383.0 402.0 L 388.0 395.0 L 387.0 386.0 L 385.0 385.0 L 385.0 381.0 L 362.0 334.0 L 362.0 332.0 L 357.0 323.0 L 357.0 320.0 L 355.0 318.0 L 354.0 314.0 L 354.0 304.0 L 355.0 303.0 L 354.0 292.0 L 346.0 273.0 L 344.0 271.0 L 344.0 269.0 L 330.0 242.0 L 328.0 235.0 L 328.0 222.0 L 325.0 214.0 L 326.0 211.0 L 332.0 218.0 L 334.0 224.0 L 337.0 228.0 L 339.0 234.0 L 340.0 244.0 L 345.0 258.0 L 369.0 300.0 L 370.0 303.0 L 369.0 320.0 L 372.0 324.0 L 380.0 344.0 L 393.0 371.0 L 397.0 375.0 L 403.0 378.0 L 406.0 377.0 L 407.0 378.0 L 430.0 378.0 L 440.0 382.0 L 449.0 390.0 L 460.0 410.0 L 469.0 443.0 L 470.0 464.0 L 458.0 479.0 L 458.0 482.0 L 460.0 485.0 L 459.0 486.0 L 485.0 486.0 L 488.0 483.0 L 487.0 466.0 L 485.0 460.0 L 485.0 434.0 L 483.0 431.0 L 483.0 425.0 L 478.0 407.0 L 478.0 402.0 L 473.0 390.0 L 471.0 380.0 L 469.0 378.0 L 464.0 363.0 L 459.0 354.0 L 456.0 352.0 L 455.0 353.0 L 449.0 352.0 L 444.0 344.0 L 444.0 340.0 L 438.0 325.0 L 438.0 321.0 L 436.0 318.0 L 436.0 315.0 L 431.0 303.0 L 431.0 300.0 L 429.0 297.0 L 429.0 294.0 L 427.0 291.0 L 424.0 279.0 L 422.0 277.0 L 417.0 266.0 L 396.0 248.0 L 373.0 231.0 L 361.0 218.0 L 349.0 202.0 L 348.0 199.0 L 345.0 197.0 L 346.0 196.0 L 344.0 195.0 L 344.0 192.0 L 331.0 175.0 L 327.0 167.0 L 314.0 149.0 L 314.0 147.0 L 310.0 143.0 L 308.0 138.0 L 302.0 130.0 L 293.0 110.0 L 275.0 92.0 L 263.0 78.0 L 247.0 64.0 L 243.0 63.0 Z
+M 141.0 296.0 L 142.0 295.0 L 149.0 300.0 L 161.0 313.0 L 164.0 319.0 L 165.0 329.0 L 163.0 334.0 L 152.0 342.0 L 139.0 345.0 L 132.0 345.0 L 127.0 340.0 L 127.0 337.0 L 124.0 332.0 L 123.0 323.0 L 125.0 319.0 L 130.0 316.0 L 142.0 314.0 L 143.0 310.0 L 142.0 309.0 L 142.0 302.0 L 140.0 297.0 Z" fill-rule="evenodd"/>
+<path fill="#101010" d="M 97.0 318.0 L 97.0 325.0 L 98.0 326.0 L 98.0 328.0 L 98.0 318.0 Z
+M 146.0 303.0 L 145.0 305.0 L 146.0 306.0 L 146.0 312.0 L 147.0 314.0 L 143.0 317.0 L 138.0 317.0 L 135.0 319.0 L 131.0 319.0 L 127.0 322.0 L 128.0 333.0 L 130.0 336.0 L 131.0 340.0 L 134.0 342.0 L 139.0 342.0 L 140.0 341.0 L 144.0 341.0 L 147.0 339.0 L 151.0 339.0 L 158.0 335.0 L 162.0 328.0 L 162.0 325.0 L 161.0 324.0 L 159.0 316.0 L 157.0 314.0 L 157.0 312.0 L 147.0 303.0 Z
+M 98.0 290.0 L 97.0 291.0 L 97.0 303.0 L 98.0 302.0 L 98.0 291.0 Z
+M 104.0 243.0 L 101.0 246.0 L 101.0 249.0 L 100.0 250.0 L 101.0 251.0 L 101.0 253.0 L 104.0 252.0 L 108.0 247.0 L 108.0 245.0 L 105.0 243.0 Z
+M 332.0 230.0 L 332.0 235.0 L 334.0 240.0 L 335.0 238.0 L 335.0 233.0 L 333.0 230.0 Z
+M 136.0 169.0 L 134.0 173.0 L 135.0 177.0 L 142.0 177.0 L 145.0 172.0 L 140.0 169.0 L 137.0 169.0 Z
+M 189.0 101.0 L 185.0 103.0 L 187.0 105.0 L 191.0 105.0 L 191.0 101.0 L 190.0 101.0 Z
+M 245.0 52.0 L 224.0 63.0 L 219.0 67.0 L 214.0 69.0 L 202.0 77.0 L 194.0 80.0 L 188.0 80.0 L 186.0 82.0 L 178.0 94.0 L 172.0 101.0 L 171.0 104.0 L 164.0 112.0 L 161.0 118.0 L 157.0 122.0 L 155.0 126.0 L 147.0 136.0 L 145.0 140.0 L 140.0 144.0 L 138.0 143.0 L 136.0 140.0 L 135.0 140.0 L 133.0 144.0 L 133.0 146.0 L 129.0 153.0 L 129.0 155.0 L 124.0 164.0 L 124.0 166.0 L 120.0 173.0 L 120.0 175.0 L 115.0 184.0 L 115.0 186.0 L 109.0 197.0 L 109.0 199.0 L 104.0 208.0 L 104.0 210.0 L 101.0 216.0 L 98.0 218.0 L 96.0 215.0 L 93.0 214.0 L 93.0 222.0 L 92.0 223.0 L 92.0 230.0 L 91.0 231.0 L 91.0 237.0 L 90.0 238.0 L 90.0 244.0 L 89.0 245.0 L 88.0 260.0 L 87.0 261.0 L 87.0 266.0 L 86.0 267.0 L 86.0 271.0 L 85.0 272.0 L 85.0 277.0 L 84.0 278.0 L 82.0 295.0 L 81.0 296.0 L 79.0 307.0 L 77.0 311.0 L 77.0 314.0 L 74.0 319.0 L 67.0 319.0 L 67.0 324.0 L 74.0 327.0 L 75.0 328.0 L 75.0 330.0 L 72.0 332.0 L 67.0 332.0 L 67.0 343.0 L 76.0 348.0 L 79.0 351.0 L 97.0 375.0 L 104.0 386.0 L 108.0 390.0 L 115.0 401.0 L 119.0 405.0 L 119.0 407.0 L 100.0 428.0 L 100.0 429.0 L 84.0 445.0 L 84.0 446.0 L 69.0 461.0 L 69.0 462.0 L 54.0 478.0 L 54.0 487.0 L 56.0 492.0 L 127.0 492.0 L 130.0 489.0 L 130.0 487.0 L 129.0 486.0 L 128.0 481.0 L 124.0 475.0 L 124.0 473.0 L 123.0 472.0 L 123.0 467.0 L 129.0 458.0 L 131.0 458.0 L 135.0 462.0 L 137.0 462.0 L 140.0 458.0 L 144.0 458.0 L 149.0 453.0 L 152.0 447.0 L 156.0 444.0 L 171.0 443.0 L 172.0 442.0 L 190.0 442.0 L 197.0 436.0 L 200.0 436.0 L 218.0 445.0 L 223.0 445.0 L 227.0 443.0 L 229.0 444.0 L 230.0 441.0 L 233.0 439.0 L 243.0 444.0 L 247.0 449.0 L 247.0 450.0 L 242.0 455.0 L 238.0 457.0 L 236.0 457.0 L 234.0 459.0 L 232.0 459.0 L 224.0 464.0 L 217.0 474.0 L 209.0 490.0 L 209.0 492.0 L 332.0 492.0 L 335.0 489.0 L 336.0 486.0 L 326.0 466.0 L 326.0 464.0 L 325.0 463.0 L 325.0 458.0 L 326.0 456.0 L 334.0 448.0 L 334.0 447.0 L 337.0 445.0 L 339.0 447.0 L 340.0 451.0 L 345.0 446.0 L 347.0 447.0 L 352.0 447.0 L 354.0 446.0 L 372.0 429.0 L 373.0 429.0 L 389.0 413.0 L 389.0 412.0 L 394.0 407.0 L 396.0 403.0 L 399.0 400.0 L 405.0 387.0 L 411.0 387.0 L 412.0 388.0 L 423.0 388.0 L 424.0 389.0 L 434.0 389.0 L 445.0 401.0 L 453.0 417.0 L 453.0 419.0 L 456.0 426.0 L 456.0 429.0 L 458.0 433.0 L 459.0 441.0 L 460.0 442.0 L 460.0 447.0 L 461.0 448.0 L 461.0 453.0 L 462.0 454.0 L 462.0 460.0 L 450.0 473.0 L 450.0 475.0 L 448.0 479.0 L 448.0 482.0 L 447.0 483.0 L 446.0 492.0 L 498.0 492.0 L 499.0 481.0 L 500.0 480.0 L 500.0 473.0 L 501.0 472.0 L 501.0 467.0 L 502.0 466.0 L 502.0 464.0 L 498.0 454.0 L 497.0 442.0 L 496.0 441.0 L 494.0 427.0 L 493.0 426.0 L 492.0 420.0 L 488.0 410.0 L 488.0 407.0 L 486.0 404.0 L 486.0 402.0 L 483.0 395.0 L 483.0 392.0 L 481.0 389.0 L 480.0 384.0 L 478.0 381.0 L 477.0 376.0 L 475.0 373.0 L 474.0 368.0 L 472.0 365.0 L 472.0 363.0 L 470.0 360.0 L 470.0 358.0 L 468.0 355.0 L 467.0 350.0 L 464.0 345.0 L 463.0 341.0 L 457.0 341.0 L 453.0 343.0 L 449.0 338.0 L 449.0 336.0 L 447.0 332.0 L 447.0 329.0 L 446.0 328.0 L 436.0 296.0 L 434.0 293.0 L 434.0 291.0 L 430.0 281.0 L 429.0 274.0 L 428.0 273.0 L 430.0 271.0 L 432.0 273.0 L 434.0 273.0 L 441.0 277.0 L 441.0 274.0 L 439.0 269.0 L 433.0 266.0 L 431.0 266.0 L 427.0 263.0 L 424.0 262.0 L 406.0 249.0 L 392.0 236.0 L 391.0 236.0 L 377.0 223.0 L 376.0 223.0 L 364.0 211.0 L 345.0 184.0 L 344.0 181.0 L 338.0 173.0 L 332.0 162.0 L 323.0 150.0 L 322.0 147.0 L 307.0 125.0 L 305.0 121.0 L 305.0 116.0 L 302.0 111.0 L 254.0 64.0 L 247.0 54.0 L 247.0 52.0 L 246.0 52.0 Z
+M 265.0 440.0 L 266.0 439.0 L 277.0 439.0 L 278.0 440.0 L 278.0 446.0 L 270.0 459.0 L 267.0 461.0 L 264.0 467.0 L 257.0 474.0 L 255.0 478.0 L 253.0 479.0 L 251.0 482.0 L 243.0 489.0 L 235.0 489.0 L 234.0 490.0 L 230.0 490.0 L 228.0 489.0 L 227.0 490.0 L 225.0 490.0 L 223.0 488.0 L 221.0 488.0 L 220.0 487.0 L 220.0 483.0 L 223.0 477.0 L 223.0 475.0 L 228.0 469.0 L 230.0 469.0 L 231.0 467.0 L 236.0 465.0 L 238.0 463.0 L 240.0 463.0 L 243.0 461.0 L 246.0 457.0 L 255.0 452.0 L 262.0 445.0 L 264.0 441.0 Z
+M 122.0 417.0 L 123.0 416.0 L 129.0 416.0 L 132.0 419.0 L 140.0 423.0 L 149.0 431.0 L 150.0 437.0 L 149.0 438.0 L 149.0 440.0 L 144.0 444.0 L 140.0 444.0 L 139.0 443.0 L 134.0 443.0 L 132.0 444.0 L 117.0 460.0 L 118.0 484.0 L 117.0 485.0 L 112.0 485.0 L 107.0 487.0 L 99.0 487.0 L 98.0 486.0 L 69.0 486.0 L 68.0 485.0 L 66.0 485.0 L 65.0 484.0 L 65.0 481.0 L 71.0 473.0 L 72.0 470.0 L 77.0 466.0 L 79.0 462.0 L 83.0 459.0 L 85.0 455.0 L 98.0 442.0 L 100.0 438.0 L 102.0 437.0 L 102.0 436.0 L 121.0 418.0 Z
+M 240.0 61.0 L 241.0 60.0 L 246.0 60.0 L 254.0 66.0 L 256.0 69.0 L 258.0 69.0 L 265.0 77.0 L 265.0 78.0 L 267.0 80.0 L 268.0 79.0 L 272.0 85.0 L 273.0 85.0 L 285.0 98.0 L 285.0 99.0 L 292.0 105.0 L 292.0 106.0 L 297.0 111.0 L 299.0 115.0 L 299.0 117.0 L 303.0 123.0 L 305.0 130.0 L 311.0 137.0 L 312.0 140.0 L 315.0 143.0 L 315.0 145.0 L 317.0 147.0 L 319.0 152.0 L 321.0 153.0 L 322.0 156.0 L 332.0 169.0 L 332.0 172.0 L 333.0 172.0 L 338.0 178.0 L 341.0 184.0 L 345.0 189.0 L 346.0 192.0 L 352.0 199.0 L 353.0 202.0 L 356.0 205.0 L 357.0 208.0 L 362.0 215.0 L 369.0 222.0 L 369.0 223.0 L 381.0 234.0 L 384.0 235.0 L 393.0 243.0 L 393.0 244.0 L 395.0 244.0 L 403.0 251.0 L 408.0 254.0 L 413.0 259.0 L 414.0 259.0 L 419.0 265.0 L 420.0 268.0 L 422.0 269.0 L 427.0 280.0 L 427.0 282.0 L 429.0 285.0 L 430.0 291.0 L 432.0 293.0 L 432.0 296.0 L 435.0 302.0 L 436.0 308.0 L 439.0 314.0 L 440.0 322.0 L 441.0 323.0 L 443.0 331.0 L 445.0 333.0 L 445.0 337.0 L 446.0 338.0 L 447.0 343.0 L 450.0 348.0 L 452.0 348.0 L 453.0 349.0 L 458.0 349.0 L 465.0 358.0 L 467.0 365.0 L 470.0 369.0 L 473.0 380.0 L 475.0 383.0 L 475.0 385.0 L 477.0 389.0 L 477.0 393.0 L 480.0 399.0 L 480.0 403.0 L 482.0 407.0 L 484.0 418.0 L 486.0 422.0 L 487.0 438.0 L 489.0 441.0 L 489.0 467.0 L 490.0 468.0 L 490.0 487.0 L 489.0 488.0 L 464.0 489.0 L 463.0 488.0 L 457.0 488.0 L 455.0 486.0 L 455.0 477.0 L 457.0 476.0 L 460.0 471.0 L 464.0 467.0 L 465.0 467.0 L 465.0 465.0 L 467.0 462.0 L 467.0 451.0 L 466.0 450.0 L 466.0 445.0 L 465.0 444.0 L 465.0 440.0 L 464.0 439.0 L 464.0 434.0 L 462.0 432.0 L 462.0 427.0 L 458.0 417.0 L 458.0 414.0 L 455.0 410.0 L 453.0 403.0 L 449.0 398.0 L 447.0 393.0 L 444.0 389.0 L 435.0 383.0 L 433.0 383.0 L 432.0 382.0 L 427.0 382.0 L 426.0 381.0 L 422.0 381.0 L 421.0 380.0 L 420.0 381.0 L 400.0 380.0 L 391.0 374.0 L 388.0 367.0 L 385.0 363.0 L 384.0 358.0 L 381.0 355.0 L 381.0 353.0 L 375.0 341.0 L 373.0 334.0 L 367.0 323.0 L 367.0 321.0 L 366.0 320.0 L 366.0 301.0 L 364.0 299.0 L 364.0 296.0 L 355.0 284.0 L 356.0 291.0 L 358.0 292.0 L 358.0 297.0 L 359.0 298.0 L 359.0 302.0 L 357.0 306.0 L 357.0 311.0 L 359.0 315.0 L 359.0 320.0 L 365.0 331.0 L 365.0 333.0 L 369.0 340.0 L 369.0 342.0 L 372.0 346.0 L 374.0 353.0 L 379.0 360.0 L 379.0 362.0 L 381.0 364.0 L 382.0 369.0 L 386.0 375.0 L 386.0 377.0 L 388.0 380.0 L 389.0 386.0 L 391.0 390.0 L 391.0 394.0 L 389.0 399.0 L 382.0 407.0 L 382.0 408.0 L 373.0 416.0 L 368.0 419.0 L 359.0 429.0 L 357.0 429.0 L 355.0 432.0 L 351.0 434.0 L 349.0 434.0 L 346.0 430.0 L 343.0 430.0 L 342.0 429.0 L 340.0 430.0 L 335.0 435.0 L 335.0 436.0 L 329.0 440.0 L 318.0 452.0 L 318.0 454.0 L 317.0 455.0 L 317.0 463.0 L 318.0 464.0 L 318.0 467.0 L 321.0 473.0 L 322.0 480.0 L 323.0 481.0 L 323.0 483.0 L 319.0 486.0 L 286.0 486.0 L 285.0 485.0 L 269.0 485.0 L 268.0 484.0 L 263.0 484.0 L 262.0 483.0 L 262.0 481.0 L 269.0 469.0 L 273.0 466.0 L 274.0 463.0 L 279.0 458.0 L 279.0 457.0 L 283.0 454.0 L 288.0 445.0 L 291.0 443.0 L 299.0 431.0 L 307.0 422.0 L 311.0 415.0 L 315.0 412.0 L 315.0 410.0 L 317.0 408.0 L 320.0 402.0 L 320.0 400.0 L 318.0 398.0 L 304.0 397.0 L 303.0 396.0 L 298.0 396.0 L 297.0 397.0 L 295.0 397.0 L 294.0 396.0 L 292.0 397.0 L 300.0 401.0 L 306.0 407.0 L 306.0 409.0 L 301.0 419.0 L 293.0 427.0 L 288.0 430.0 L 283.0 430.0 L 282.0 431.0 L 258.0 431.0 L 258.0 432.0 L 256.0 433.0 L 253.0 437.0 L 245.0 436.0 L 243.0 434.0 L 238.0 433.0 L 236.0 431.0 L 230.0 428.0 L 224.0 428.0 L 223.0 427.0 L 218.0 432.0 L 211.0 431.0 L 207.0 428.0 L 202.0 426.0 L 200.0 424.0 L 200.0 417.0 L 201.0 416.0 L 201.0 413.0 L 205.0 402.0 L 205.0 381.0 L 206.0 380.0 L 206.0 372.0 L 205.0 371.0 L 205.0 357.0 L 204.0 356.0 L 204.0 353.0 L 202.0 352.0 L 201.0 353.0 L 199.0 353.0 L 198.0 358.0 L 197.0 359.0 L 197.0 365.0 L 201.0 368.0 L 201.0 372.0 L 202.0 373.0 L 202.0 382.0 L 203.0 383.0 L 203.0 393.0 L 201.0 397.0 L 201.0 404.0 L 197.0 412.0 L 188.0 421.0 L 188.0 422.0 L 184.0 426.0 L 184.0 428.0 L 181.0 432.0 L 179.0 433.0 L 161.0 433.0 L 156.0 429.0 L 150.0 421.0 L 147.0 420.0 L 139.0 414.0 L 137.0 414.0 L 129.0 406.0 L 123.0 397.0 L 121.0 396.0 L 116.0 390.0 L 116.0 388.0 L 110.0 382.0 L 110.0 381.0 L 106.0 378.0 L 91.0 357.0 L 89.0 356.0 L 89.0 354.0 L 86.0 351.0 L 81.0 339.0 L 80.0 331.0 L 81.0 330.0 L 81.0 317.0 L 83.0 315.0 L 83.0 310.0 L 84.0 309.0 L 84.0 305.0 L 85.0 304.0 L 85.0 297.0 L 86.0 296.0 L 86.0 292.0 L 87.0 291.0 L 87.0 282.0 L 86.0 281.0 L 88.0 279.0 L 89.0 262.0 L 90.0 261.0 L 90.0 253.0 L 91.0 252.0 L 91.0 248.0 L 92.0 247.0 L 92.0 239.0 L 94.0 235.0 L 94.0 232.0 L 97.0 226.0 L 102.0 220.0 L 107.0 209.0 L 109.0 207.0 L 109.0 205.0 L 112.0 199.0 L 114.0 197.0 L 113.0 195.0 L 117.0 189.0 L 117.0 186.0 L 119.0 183.0 L 119.0 181.0 L 122.0 177.0 L 123.0 173.0 L 126.0 169.0 L 127.0 165.0 L 129.0 164.0 L 130.0 159.0 L 135.0 153.0 L 138.0 152.0 L 143.0 148.0 L 143.0 146.0 L 147.0 143.0 L 153.0 134.0 L 157.0 130.0 L 159.0 126.0 L 163.0 122.0 L 164.0 118.0 L 167.0 116.0 L 169.0 112.0 L 178.0 101.0 L 180.0 97.0 L 182.0 96.0 L 187.0 90.0 L 195.0 84.0 L 198.0 83.0 L 201.0 80.0 L 203.0 80.0 L 205.0 78.0 L 210.0 76.0 L 214.0 73.0 L 218.0 72.0 L 220.0 70.0 L 223.0 70.0 L 225.0 68.0 L 230.0 68.0 L 239.0 61.0 Z" fill-rule="evenodd"/>
+</g>
+      </svg>
+          <div class="footer-tagline" data-lang-key="footer.tagline">Строительство жилых и промышленных объектов</div>
+        </div>
+        <div class="footer-links">
+          <a href="#services" data-lang-key="footer.services">Услуги</a>
+          <a href="#projects" data-lang-key="footer.projects">Проекты</a>
+        </div>
+      </div>
+
+      <div class="footer-col"> 
+        <div class="footer-links" style="margin-top:112px"> 
+          <a href="about.html" data-lang-key="footer.about">О нас</a> 
+          <a href="vacancy.html" data-lang-key="footer.vacancy">Вакансии</a> 
+        </div> 
+      </div>
+
+      <div class="footer-col footer-question" id="contacts">
+        <h3 data-lang-key="footer.question">У вас есть вопросы?<br>Напишите нам!</h3>
+        <p data-lang-key="footer.questionText">Оставьте заявку, и мы быстро свяжемся для обсуждения вашего вопроса.</p>
+        <a class="footer-btn" href="#" id="footerCta"><span data-lang-key="footer.ask">Задать вопрос</span><span>→</span></a>
+      </div>
+
+      <div class="footer-col footer-contact">
+        <div class="footer-social">
+          <a href="https://www.instagram.com/zubrstroi/" aria-label="Instagram">
+            <span>Instagram</span>
+            <span class="social-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <rect x="3" y="3" width="18" height="18" rx="5" fill="none" stroke-width="2"/>
+                <circle cx="12" cy="12" r="4.2" fill="none" stroke-width="2"/>
+                <circle cx="17.5" cy="6.5" r="1.2" stroke="none"/>
+              </svg>
+            </span>
+          </a>
+          <a href="https://www.tiktok.com/@zubrmontazhstroy" aria-label="TikTok">
+            <span>TikTok</span>
+            <span class="social-icon">
+              <svg viewBox="0 0 24 24" aria-hidden="true">
+                <path d="M15.2 3c.4 2.3 1.7 3.8 4.2 4.2v3.1c-1.5-.1-2.9-.6-4.1-1.5v6.4c0 3.7-2.5 5.8-5.6 5.8-3 0-5.2-2-5.2-4.8 0-3 2.5-5.1 5.7-5.1.4 0 .8 0 1.2.1v3.1c-.3-.1-.7-.2-1.1-.2-1.3 0-2.5.8-2.5 2 0 1 .8 1.8 2 1.8 1.4 0 2.2-.9 2.2-2.8V3h3.2z"/>
+              </svg>
+            </span>
+          </a>
+        </div>
+        <a class="footer-phone"  href="tel:+375 223 55-14-00">+375 223 55-14-00</a>
+        <a class="footer-email" href="mailto:zubrmstroy@gmail.com">zubrmstroy@gmail.com</a>
+        <div class="footer-address" data-lang-key="footer.address">Беларусь<br>Работаем по всей стране</div>
+      </div>
+    </div>
+    <div class="footer-watermark" aria-hidden="true">ЗУБРМОНТАЖСТРОЙ</div>
+    <div class="footer-bottom container">
+      <span data-lang-key="footer.copyright">© 2026 ЗубрМонтажСтрой</span>
+      <span><a href="#" data-lang-key="footer.privacy">Политика конфиденциальности</a> · <a href="#" data-lang-key="footer.terms">Пользовательское соглашение</a></span>
+    </div>
+  </footer>
+
+  <script>
+    // ===== РЕГИСТРАЦИЯ GSAP =====
+    gsap.registerPlugin(ScrollTrigger);
+
+    // ===== ОБЪЕКТ ПЕРЕВОДОВ =====
+    const translations = {
+      ru: {
+        'promo-title': 'Строим <span class="accent">объекты</span><br />под ключ',
+        'promo-sub': 'Возводим жилые комплексы, промышленные здания, инженерные сети – по всей стране. Гарантия качества и соблюдение сроков.',
+        'mainCta': 'Оставить заявку',
+        'nav.home': 'Главная',
+        'nav.services': 'Услуги',
+        'nav.projects': 'Проекты',
+        'nav.equipment': 'Техника',
+        'nav.contacts': 'Контакты',
+        'projects.kicker': 'Наши проекты',
+        'projects.title': 'Опыт, масштаб и результат',
+        'projects.intro': 'Реализуем строительные проекты от инженерной подготовки до полного ввода объекта в эксплуатацию.',
+        'project1.title': 'Осиповичское РОВД',
+        'project1.meta': 'Осиповичи · строительный объект',
+        'project2.title': 'Инженерные сети объекта',
+        'project2.meta': 'Инженерные сети · 2025',
+        'project3.title': 'Жилой комплекс',
+        'project3.meta': 'Монолитные работы · 2024',
+        'project4.title': 'Дорожная инфраструктура',
+        'project4.meta': 'Инфраструктура · 2024',
+        'project5.title': 'Следственный комитет г. Осиповичи',
+        'project5.meta': 'Осиповичи · строительный объект',
+        'project6.title': 'Гостиница г. Осиповичи',
+        'project6.meta': 'Осиповичи · гостиница',
+        'projects.cta': 'Обсудить новый проект →',
+        'facts.kicker': 'ЗУБРМОНТАЖСТРОЙ / 2026',
+        'facts.title': 'Опыт, масштаб,<br><span>результат.</span>',
+        'fact1': 'лет строительной практики',
+        'fact2': 'объектов доведено до результата',
+        'fact3': 'клиентов рекомендуют нас',
+        'fact4': 'защищаем результат гарантией',
+        'services.title': 'Наши услуги',
+        'service1.title': 'Строительство жилых комплексов',
+        'service1.desc': 'Многоэтажные дома, коттеджные посёлки, таунхаусы – полный цикл от проекта до ввода в эксплуатацию.',
+        'service2.title': 'Промышленное строительство',
+        'service2.desc': 'Заводы, склады, логистические центры – строим с учётом всех технологических требований.',
+        'service3.title': 'Инженерные сети и инфраструктура',
+        'service3.desc': 'Водоснабжение, канализация, теплотрассы, дороги – под ключ для любых объектов.',
+        'advantages.title': 'Почему мы?',
+        'adv1.title': 'Работаем в любых условиях',
+        'adv1.desc': 'Опыт строительства в разных климатических зонах – от севера до юга.',
+        'adv2.title': 'Собственный парк техники',
+        'adv2.desc': 'Краны, экскаваторы, бульдозеры – мы полностью обеспечиваем себя ресурсами.',
+        'adv3.title': 'Инженерный подход',
+        'adv3.desc': 'Применяем BIM-технологии, точные расчёты и современные строительные материалы.',
+        'adv4.title': 'Гарантия 5 лет',
+        'adv4.desc': 'Даём письменную гарантию на все виды работ – это наш стандарт качества.',
+        'footer': '© 2026 ЗубрМонтажСтрой. Все права защищены.',
+        'footer.tagline': 'Строительство жилых и промышленных объектов',
+        'footer.services': 'Услуги',
+        'footer.projects': 'Проекты',
+        'footer.about': 'О нас',
+        'footer.equipment': 'Техника',
+        'footer.contactsLink': 'Контакты',
+        'footer.question': 'У вас есть вопросы?<br>Напишите нам!',
+        'footer.questionText': 'Оставьте заявку, и мы быстро свяжемся для обсуждения вашего вопроса.',
+        'footer.ask': 'Задать вопрос',
+        'footer.address': 'Беларусь · Работаем по всей стране',
+        'footer.copyright': '© 2026 ЗубрМонтажСтрой',
+        'footer.privacy': 'Политика конфиденциальности',
+        'footer.terms': 'Пользовательское соглашение'
+      },
+      en: {
+        'promo-title': 'Building <span class="accent">turnkey</span><br />facilities',
+        'promo-sub': 'We construct residential complexes, industrial buildings, and utility networks across the country. Quality guaranteed and deadlines met.',
+        'mainCta': 'Request a quote',
+        'nav.home': 'Home',
+        'nav.services': 'Services',
+        'nav.projects': 'Projects',
+        'nav.equipment': 'Equipment',
+        'nav.contacts': 'Contacts',
+        'projects.kicker': 'Our Projects',
+        'projects.title': 'Experience, scale and results',
+        'projects.intro': 'We deliver construction projects from engineering preparation to full commissioning.',
+        'project1.title': 'Osipovichi District Police Department',
+        'project1.meta': 'Osipovichi · construction project',
+        'project2.title': 'Engineering Networks',
+        'project2.meta': 'Utility Networks · 2025',
+        'project3.title': 'Residential Complex',
+        'project3.meta': 'Concrete Works · 2024',
+        'project4.title': 'Road Infrastructure',
+        'project4.meta': 'Infrastructure · 2024',
+        'project5.title': 'Investigative Committee of Osipovichi',
+        'project5.meta': 'Osipovichi · construction project',
+        'project6.title': 'Hotel in Osipovichi',
+        'project6.meta': 'Osipovichi · hotel',
+        'projects.cta': 'Discuss a new project →',
+        'facts.kicker': 'ZUBRMONTAZHSTROY / 2026',
+        'facts.title': 'Experience, scale,<br><span>results.</span>',
+        'fact1': 'years of construction practice',
+        'fact2': 'projects delivered to result',
+        'fact3': 'clients recommend us',
+        'fact4': 'warranty on works',
+        'services.title': 'Our Services',
+        'service1.title': 'Residential Construction',
+        'service1.desc': 'High-rise buildings, cottage villages, townhouses – full cycle from design to commissioning.',
+        'service2.title': 'Industrial Construction',
+        'service2.desc': 'Factories, warehouses, logistics centers – built to meet all technological requirements.',
+        'service3.title': 'Utility Networks & Infrastructure',
+        'service3.desc': 'Water supply, sewage, heating mains, roads – turnkey for any facility.',
+        'advantages.title': 'Why Us?',
+        'adv1.title': 'Work in any conditions',
+        'adv1.desc': 'Experience across various climate zones – from north to south.',
+        'adv2.title': 'Own fleet of machinery',
+        'adv2.desc': 'Cranes, excavators, bulldozers – we are self-sufficient in resources.',
+        'adv3.title': 'Engineering approach',
+        'adv3.desc': 'We use BIM technologies, precise calculations, and modern building materials.',
+        'adv4.title': '5-year warranty',
+        'adv4.desc': 'We provide a written guarantee for all types of work – our quality standard.',
+        'footer': '© 2026 ZubrMontazhStroy. All rights reserved.',
+        'footer.tagline': 'Construction of residential and industrial facilities',
+        'footer.services': 'Services',
+        'footer.projects': 'Projects',
+        'footer.about': 'About us',
+        'footer.equipment': 'Equipment',
+        'footer.contactsLink': 'Contacts',
+        'footer.question': 'Have questions?<br>Write to us!',
+        'footer.questionText': 'Leave a request and we will quickly contact you to discuss your question.',
+        'footer.ask': 'Ask a question',
+        'footer.address': 'Belarus · We work throughout the country',
+        'footer.copyright': '© 2026 ZubrMontazhStroy',
+        'footer.privacy': 'Privacy policy',
+        'footer.terms': 'User agreement'
+      }
+    };
+
+    // ===== ПЕРЕКЛЮЧЕНИЕ ЯЗЫКА =====
+    let currentLang = 'ru';
+
+    function setLanguage(lang) {
+      currentLang = lang;
+      const t = translations[lang];
+
+      document.querySelectorAll('[data-lang-key]').forEach(el => {
+        const key = el.dataset.langKey;
+        if (t[key] !== undefined) {
+          if (el.tagName === 'H1' || el.tagName === 'H2' || el.tagName === 'H3' || el.tagName === 'H4' || el.tagName === 'P') {
+            el.innerHTML = t[key];
+          } else {
+            el.textContent = t[key];
+          }
+        }
+      });
+
+      document.getElementById('promo-title').innerHTML = t['promo-title'];
+      document.getElementById('promo-sub').textContent = t['promo-sub'];
+      document.getElementById('mainCta').textContent = t['mainCta'];
+
+      document.querySelectorAll('.lang-toggle button').forEach(btn => {
+        btn.classList.toggle('active', btn.dataset.lang === lang);
+      });
+    }
+
+    document.querySelectorAll('.lang-toggle button').forEach(btn => {
+      btn.addEventListener('click', function() {
+        const lang = this.dataset.lang;
+        if (lang !== currentLang) {
+          setLanguage(lang);
+          ScrollTrigger.refresh();
+        }
+      });
+    });
+
+    // ===== АНИМАЦИЯ ТОЧНОГО SVG-ЗУБРА (из первого кода) =====
+    const hatch1 = document.getElementById('hatch1');
+    const hatch2 = document.getElementById('hatch2');
+    const zubr1 = hatch1.querySelector('.exact-zubr');
+
+    // Анимация появления (оставляем из main.html)
+    gsap.fromTo(hatch1,
+      { autoAlpha:0, y:75, scale:.90 },
+      {
+        autoAlpha:1, y:0, scale:1, duration:1.35, ease:'power3.out',
+        onComplete:() => {
+          // Легкое "дыхание" зубра (из первого кода)
+          gsap.to(zubr1, {
+            y: -4,
+            scaleY: 1.012,
+            duration: 1.25,
+            repeat: -1,
+            yoyo: true,
+            ease: 'sine.inOut'
+          });
+        }
+      }
+    );
+
+    // Главный зубр больше НЕ исчезает при прокрутке.
+    // Оставляем его в исходном месте; анимация появления и "дыхание" работают постоянно.
+    gsap.set(hatch1, {
+      autoAlpha: 1,
+      x: 0,
+      y: 0,
+      rotation: 0,
+      scale: 1
+    });
+// Второй зубр (hatch2) в этом проекте не используется, скрываем
+    if (hatch2) {
+      gsap.set(hatch2, { autoAlpha: 0, display: 'none' });
+    }
+
+    // ===== НОВАЯ АНИМАЦИЯ СТАТИСТИКИ =====
+    document.querySelectorAll('.fact-slide').forEach((item, index) => {
+      ScrollTrigger.create({
+        trigger: item,
+        start: 'top 82%',
+        once: true,
+        onEnter: () => {
+          item.classList.add('is-visible');
+
+          // Небольшое индивидуальное смещение — эффект "живой" ленты.
+          gsap.fromTo(item,
+            { x: index % 2 ? 28 : -28 },
+            { x: 0, duration: 1.05, ease: 'power3.out' }
+          );
+        }
+      });
+    });
+
+    // ===== АНИМАЦИЯ ПОЯВЛЕНИЯ =====
+    document.querySelectorAll('.fade-up').forEach((el, index) => {
+      gsap.fromTo(el,
+        { opacity: 0, y: 40 },
+        {
+          opacity: 1,
+          y: 0,
+          duration: 0.8,
+          delay: 0.1 * index,
+          scrollTrigger: {
+            trigger: el,
+            start: 'top 90%',
+            toggleActions: 'play none none none'
+          }
+        }
+      );
+    });
+
+
+    // Защита от повторного скрытия главного зубра после прокрутки/возврата.
+    window.addEventListener('pageshow', () => {
+      const mainZubr = document.getElementById('hatch1');
+      if (mainZubr) {
+        gsap.set(mainZubr, {
+          autoAlpha: 1,
+          x: 0,
+          y: 0,
+          rotation: 0,
+          scale: 1
+        });
+      }
+    });
+
+    // ===== ОБНОВЛЕНИЕ ПРИ ИЗМЕНЕНИИ РАЗМЕРА =====
+    window.addEventListener('resize', () => ScrollTrigger.refresh());
+
+    // Инициализация
+    setLanguage('ru');
+  </script>
+
+  <div class="request-modal" id="requestModal" aria-hidden="true">
+    <div class="request-box" role="dialog" aria-modal="true" aria-labelledby="requestTitle">
+      <button type="button" class="request-close-x" id="requestCloseX" aria-label="Закрыть">×</button>
+      <div class="request-head">
+        <div class="request-kicker">ЗУБРМОНТАЖСТРОЙ / ЗАЯВКА</div>
+        <h2 id="requestTitle">Оставить заявку</h2>
+        <p>Заполните данные инициатора и опишите задачу.</p>
+      </div>
+      <form class="request-form" id="requestForm">
+        <div class="request-grid">
+          <div class="request-field"><label>Фамилия *</label><input name="lastName" required></div>
+          <div class="request-field"><label>Имя *</label><input name="firstName" required></div>
+          <div class="request-field"><label>Отчество</label><input name="middleName"></div>
+          <div class="request-field"><label>Телефон *</label><input name="phone" type="tel" required></div>
+          <div class="request-field full"><label>От кого заявка *</label><input name="from" required></div>
+          <div class="request-field full"><label>Текст заявки *</label><textarea name="requestText" required></textarea></div>
+        </div>
+        <div class="request-actions">
+          <button type="button" class="request-close" id="requestClose">Отмена</button>
+          <button type="submit" class="request-submit">Отправить заявку →</button>
+        </div>
+        <div class="request-status" id="requestStatus"></div>
+      </form>
+    </div>
+  </div>
+
+
+<script>
+(function(){
+  const modal = document.getElementById('requestModal');
+  const form = document.getElementById('requestForm');
+  const status = document.getElementById('requestStatus');
+
+  if(!modal || !form) return;
+
+  const open = () => {
+    modal.classList.add('active');
+    modal.setAttribute('aria-hidden','false');
+    document.body.style.overflow='hidden';
+    setTimeout(()=>form.querySelector('input')?.focus(),200);
+  };
+
+  const close = () => {
+    modal.classList.remove('active');
+    modal.setAttribute('aria-hidden','true');
+    document.body.style.overflow='';
+  };
+
+  document.querySelectorAll(
+    '#mainCta, #footerCta, .footer-btn, a.btn, [data-open-request]'
+  ).forEach(el=>{
+    el.addEventListener('click', e=>{
+      e.preventDefault();
+      open();
+    });
+  });
+
+  document.getElementById('requestClose')?.addEventListener('click', close);
+  document.getElementById('requestCloseX')?.addEventListener('click', close);
+  modal.addEventListener('click', e=>{ if(e.target===modal) close(); });
+
+  document.addEventListener('keydown', e=>{
+    if(e.key==='Escape' && modal.classList.contains('active')) close();
+  });
+
+  form.addEventListener('submit', e=>{
+    e.preventDefault();
+    const fd = new FormData(form);
+    const text =
+      `От кого: ${fd.get('from')}\n`+
+      `ФИО инициатора: ${fd.get('lastName')} ${fd.get('firstName')} ${fd.get('middleName')||''}`.trim()+`\n`+
+      `Телефон: ${fd.get('phone')}\n\n`+
+      `Текст заявки:\n${fd.get('requestText')}`;
+
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(text).catch(()=>{});
+    }
+
+    status.textContent='Заявка сформирована. Текст заявки скопирован в буфер обмена.';
+  });
+})();
+
+/* ===== МИКРОПАРАЛЛАКС ДЛЯ НОВЫХ КАРТОЧЕК ===== */
+const interactiveCards = document.querySelectorAll('.service-card-pro, .advantage-item-pro');
+interactiveCards.forEach(card => {
+  card.addEventListener('pointermove', e => {
+    if (window.innerWidth <= 900) return;
+    const r = card.getBoundingClientRect();
+    const x = (e.clientX - r.left) / r.width - .5;
+    const y = (e.clientY - r.top) / r.height - .5;
+    card.style.transform = `translateY(-10px) rotateX(${(-y*3).toFixed(2)}deg) rotateY(${(x*4).toFixed(2)}deg) scale(1.012)`;
+  });
+  card.addEventListener('pointerleave', () => {
+    card.style.transform = '';
+  });
+});
+
+</script>
+
+
+<script>
+document.addEventListener('DOMContentLoaded', function(){
+  document.querySelectorAll('.mobile-menu-toggle').forEach(function(btn){
+    const header=btn.closest('header');
+    const nav=header && header.querySelector('nav, .nav-links');
+    if(!nav) return;
+    function close(){
+      nav.classList.remove('mobile-open');
+      btn.classList.remove('active');
+      btn.setAttribute('aria-expanded','false');
+    }
+    btn.addEventListener('click',function(e){
+      e.stopPropagation();
+      const open=!nav.classList.contains('mobile-open');
+      nav.classList.toggle('mobile-open',open);
+      btn.classList.toggle('active',open);
+      btn.setAttribute('aria-expanded',String(open));
+    });
+    nav.querySelectorAll('a').forEach(function(a){a.addEventListener('click',close)});
+    document.addEventListener('click',function(e){if(!header.contains(e.target)) close()});
+    window.addEventListener('resize',function(){if(window.innerWidth>760) close()});
+  });
+});
+</script>
+
+</body>
+</html>
